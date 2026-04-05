@@ -10,7 +10,6 @@ const authRoutes = require("./routes/authRoutes");
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Update CORS to be more permissive for your Vercel frontend
 app.use(
   cors({
     origin: "*",
@@ -20,7 +19,6 @@ app.use(
 
 app.use(express.json());
 
-// 1. ADD THIS: Health Check for Railway
 app.get("/", (req, res) => {
   res.status(200).send("🚀 FatJobs Backend is Live and Running!");
 });
@@ -35,15 +33,15 @@ mongoose
   .then(() => {
     console.log("✅ Cloud Database Linked!");
 
-    // CRON: Every 5 Minutes
-    nodeCron.schedule("*/5 * * * *", () => {
-      console.log("⏰ 5-Minute Mark: Syncing Jobs...");
+    // FIXED: Changed from 5 minutes to 12 hours (Twice a day)
+    // Running every 5 minutes will burn through your API key in 1 hour.
+    nodeCron.schedule("0 */12 * * *", () => {
+      console.log("⏰ 12-Hour Mark: Syncing Jobs...");
       scrapeJobs().catch((err) =>
-        console.log("Scrape error ignored to keep server up:", err.message),
+        console.log("Scrape error ignored:", err.message),
       );
     });
 
-    // 2. FIXED: Added '0.0.0.0' and removed blocking scrapeJobs() on startup
     app.listen(PORT, "0.0.0.0", () => {
       console.log(`>>> [SYSTEM] Server active on port ${PORT}`);
     });
