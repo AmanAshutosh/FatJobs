@@ -8,10 +8,24 @@ const jobRoutes = require("./routes/jobRoutes");
 const authRoutes = require("./routes/authRoutes");
 
 const app = express();
+// Railway provides the PORT variable automatically
 const PORT = process.env.PORT || 5000;
 
-app.use(cors());
+// Updated CORS for Production
+app.use(
+  cors({
+    origin: "*", // Allows Vercel to talk to Railway
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  }),
+);
+
 app.use(express.json());
+
+// Health Check Route (Crucial for Railway to see the app is "Alive")
+app.get("/", (req, res) => {
+  res.send("FatJobs API is Running...");
+});
 
 app.use("/api/auth", authRoutes);
 app.use("/api", jobRoutes);
@@ -29,9 +43,9 @@ mongoose
       scrapeJobs();
     });
 
-    app.listen(PORT, () => {
-     console.log(`>>> [SYSTEM] Server active on port ${PORT}`);
-      // scrapeJobs(); // Run once on startup to verify tech-filter
+    // FIXED: Listen on '0.0.0.0' for Railway compatibility
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`>>> [SYSTEM] Server active on port ${PORT}`);
     });
   })
   .catch((err) => {
