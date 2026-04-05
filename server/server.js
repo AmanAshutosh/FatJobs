@@ -30,7 +30,7 @@ mongoose
     });
 
     app.listen(PORT, () => {
-      console.log(`🚀 Server active on Port ${PORT}`);
+     console.log(`>>> [SYSTEM] Server active on port ${PORT}`);
       // scrapeJobs(); // Run once on startup to verify tech-filter
     });
   })
