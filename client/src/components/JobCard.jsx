@@ -3,31 +3,42 @@ import "../styles/JobCard.css";
 
 const JobCard = ({ job }) => {
   const jobStats = useMemo(() => {
-    const jobDate = new Date(job.createdAt);
-    const now = Date.now();
+    // We use postedAt (from scraper) or createdAt (from DB)
+    const jobDate = new Date(job.postedAt || job.createdAt);
+    const now = new Date();
     const diffInHours = (now - jobDate.getTime()) / (1000 * 60 * 60);
 
-    // FIX: If job is older than 24 hours, don't show it
-    if (diffInHours > 24) return null;
-
     let sClass = "status-pulse";
+    let label = "RECENT";
+
     if (diffInHours <= 12) {
-      sClass += " hot"; // Green
+      sClass += " hot"; // Green - Very Fresh
+      label = "NEW";
+    } else if (diffInHours <= 48) {
+      sClass += " warm"; // Orange - Active
+      label = "ACTIVE";
     } else {
-      sClass += " warm"; // Orange
+      sClass += " cold"; // Blue/Grey - Older
+      label = "ARCHIVED";
     }
 
-    const timeLabel = jobDate.toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    });
+    const timeLabel =
+      jobDate.toLocaleDateString([], {
+        month: "short",
+        day: "numeric",
+      }) +
+      " " +
+      jobDate.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+      });
 
-    return { sClass, timeLabel };
-  }, [job.createdAt]);
+    return { sClass, timeLabel, label };
+  }, [job.postedAt, job.createdAt]);
 
-  // If the job is older than 24h, we return nothing
-  if (!jobStats) return null;
+  // Production Safety: If job data is missing, don't crash the app
+  if (!job) return null;
 
   return (
     <div className="trump-card-wrapper">
@@ -41,7 +52,10 @@ const JobCard = ({ job }) => {
             </p>
           </div>
           <div className="card-flag">
-            <div className={jobStats.sClass} title="Job Status"></div>
+            <div
+              className={jobStats.sClass}
+              title={`Status: ${jobStats.label}`}
+            ></div>
           </div>
         </div>
 
@@ -63,7 +77,7 @@ const JobCard = ({ job }) => {
         <div className="card-stats">
           {[
             { key: "COMPANY", value: job.company || "N/A" },
-            { key: "EXPERIENCE", value: job.experience || "0-1 Years" },
+            { key: "EXPERIENCE", value: job.experience || "Not Specified" },
             { key: "SETTING", value: job.workType || "On-site" },
             { key: "LOCATION", value: job.location || "India" },
             {
