@@ -45,6 +45,10 @@
   color: #0f172a;
   margin: 0;
   line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
 }
 
 .card-platform-tag {
@@ -54,35 +58,55 @@
   margin-top: 2px;
 }
 
-/* PULSE LIGHTS */
+/* PULSE LIGHTS - LOGIC ALIGNED */
 .status-pulse {
   width: 16px;
   height: 16px;
   border-radius: 50%;
+  border: 1px solid rgba(0,0,0,0.1);
 }
 
-/* GREEN: Under 12 hours */
+/* GREEN: Under 24 hours (NEW) */
 .status-pulse.hot { 
   background-color: #22c55e; 
   animation: pulse-green 2s infinite; 
 }
 
-/* ORANGE: 12-24 hours */
+/* ORANGE: 24-48 hours (RECENT) */
 .status-pulse.warm { 
   background-color: #f97316; 
   animation: pulse-orange 2s infinite; 
 }
 
+/* RED: 48-72 hours (URGENT) */
+.status-pulse.urgent { 
+  background-color: #ef4444; 
+  animation: pulse-red 2s infinite; 
+}
+
+/* BLUE/GREY: Older than 72 hours (ARCHIVED) */
+.status-pulse.cold {
+  background-color: #94a3b8;
+  box-shadow: none;
+}
+
+/* KEYFRAMES FOR PULSING */
 @keyframes pulse-green {
   0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
-  70% { box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+  70% { box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
   100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
 }
 
 @keyframes pulse-orange {
   0% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.7); }
-  70% { box-shadow: 0 0 0 6px rgba(249, 115, 22, 0); }
+  70% { box-shadow: 0 0 0 8px rgba(249, 115, 22, 0); }
   100% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0); }
+}
+
+@keyframes pulse-red {
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+  70% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
 }
 
 /* IMAGE SECTION */
@@ -110,7 +134,7 @@
 }
 
 .image-circle span {
-  font-size: 2.5rem; /* Larger first letter */
+  font-size: 2.5rem;
   font-weight: 800;
   color: #1a1a1a;
   text-transform: uppercase;
@@ -144,6 +168,7 @@
   font-size: 9px;
   font-weight: 800;
   color: #475569;
+  text-transform: uppercase;
 }
 
 .stat-value {
@@ -152,6 +177,7 @@
   color: #0f172a;
 }
 
+/* FOOTER BUTTON */
 .apply-file-button {
   display: block;
   width: 100%;
