@@ -10,8 +10,14 @@ const DataAnalyst = () => {
 
   const fetchDAJobs = useCallback(async () => {
     try {
+      // Requesting only DA category from Railway
       const response = await axios.get(`${API_URL}/api/jobs?category=DA`);
-      setJobs(response.data);
+
+      if (Array.isArray(response.data)) {
+        setJobs(response.data);
+      } else {
+        setJobs([]);
+      }
     } catch (error) {
       console.error("❌ DA Fetch Error:", error);
     } finally {
@@ -21,6 +27,7 @@ const DataAnalyst = () => {
 
   useEffect(() => {
     fetchDAJobs();
+    // Re-sync when user returns to tab
     window.addEventListener("focus", fetchDAJobs);
     return () => window.removeEventListener("focus", fetchDAJobs);
   }, [fetchDAJobs]);
@@ -46,13 +53,13 @@ const DataAnalyst = () => {
               <h3 className="da-sync-text">🚀 Syncing Data Deck...</h3>
             </div>
           ) : jobs.length > 0 ? (
-            jobs.map((job) => <JobCard key={job._id} job={job} />)
+            jobs.map((job) => <JobCard key={job._id || job.link} job={job} />)
           ) : (
             <div className="coming-soon-box">
               <h3>Deck Empty</h3>
               <p>
-                Scanning global boards for new Data roles. Please refresh in a
-                moment.
+                The scraper is currently searching for new Data roles. Check
+                back in a few minutes.
               </p>
             </div>
           )}
