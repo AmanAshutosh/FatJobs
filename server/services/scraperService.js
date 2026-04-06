@@ -4,16 +4,14 @@ const Job = require("../models/Job");
 const JSEARCH_API_KEY = process.env.JSEARCH_API_KEY;
 
 // 1. FILTERS (Broadened to ensure roles are captured)
-// Removed the strict \b boundaries on some terms to catch variations
 const ALLOWED_ROLES =
-  /(software|sde|frontend|backend|fullstack|data\s*analyst|analytics|business\s*analyst|bi\s*analyst|data\s*scientist|web\s*developer|react|node|python|java)/i;
+  /(software|sde|frontend|backend|fullstack|data\s*analyst|analytics|scientist|developer|react|node|android|ios|python|java|staff|principal)/i;
 const BANNED_KEYWORDS =
   /\b(mis|officer|sales|relationship|trainee|support|hr|marketing|operations|finance|accountant|executive|call\s*center|bpo)\b/i;
 
 const isStrictTechRole = (title) => {
   if (!title) return false;
   const t = title.toLowerCase();
-  // Ensure it's an allowed role and NOT a banned one
   return ALLOWED_ROLES.test(t) && !BANNED_KEYWORDS.test(t);
 };
 
@@ -23,10 +21,9 @@ const extractExactExp = (text) => {
   return match ? match[0].trim() : "Not Specified";
 };
 
-// 2. FIXED: Helper for Database Upsert (Removed Deprecation Warnings)
+// 2. FIXED: Removed Deprecation Warnings & Handled Network Timeouts
 const upsertJob = async (link, data) => {
   try {
-    // Mongoose fix: Use returnDocument instead of 'new'
     await Job.findOneAndUpdate({ link }, data, {
       upsert: true,
       returnDocument: "after",
@@ -36,7 +33,7 @@ const upsertJob = async (link, data) => {
   }
 };
 
-// 3. GREENHOUSE SOURCE
+// 3. GREENHOUSE SOURCE (Added PhonePe & Zomato cleanup)
 const GREENHOUSE_COMPANIES = [
   "binance",
   "razorpay",
@@ -50,7 +47,7 @@ const GREENHOUSE_COMPANIES = [
   "meesho",
   "zepto",
   "blinkit",
-  "phonepe", // Removed Zomato as it's blocking requests
+  "phonepe",
 ];
 
 const scrapeGreenhouse = async () => {
@@ -59,13 +56,9 @@ const scrapeGreenhouse = async () => {
     try {
       const res = await axios.get(
         `https://boards-api.greenhouse.io/v1/boards/${company}/jobs?content=true`,
-        { timeout: 10000 },
+        { timeout: 8000 }, // Slightly shorter timeout to keep the loop moving
       );
       const jobs = res.data.jobs || [];
-
-      console.log(
-        `🔍 ${company.toUpperCase()}: Found ${jobs.length} total roles.`,
-      );
 
       for (const j of jobs) {
         if (!isStrictTechRole(j.title)) continue;
@@ -104,10 +97,7 @@ const JSEARCH_QUERIES = [
 ];
 
 const scrapeJSearch = async () => {
-  if (!JSEARCH_API_KEY) {
-    console.log("❌ No JSearch API Key found in ENV.");
-    return;
-  }
+  if (!JSEARCH_API_KEY) return;
 
   const randomQuery =
     JSEARCH_QUERIES[Math.floor(Math.random() * JSEARCH_QUERIES.length)];
@@ -125,12 +115,10 @@ const scrapeJSearch = async () => {
         "X-RapidAPI-Key": JSEARCH_API_KEY,
         "X-RapidAPI-Host": "jsearch.p.rapidapi.com",
       },
-      timeout: 15000,
+      timeout: 12000,
     });
 
     const jobs = res.data?.data || [];
-    console.log(`🔍 JSearch: Found ${jobs.length} roles for current query.`);
-
     for (const j of jobs) {
       if (!isStrictTechRole(j.job_title)) continue;
 
@@ -168,6 +156,10 @@ const scrapeJobs = async () => {
     const deleted = await Job.deleteMany({ postedAt: { $lt: cutoff } });
 
     console.log(`🧹 Cleanup: Removed ${deleted.deletedCount} old jobs.`);
+
+    // FAIL-SAFE: If you have an email notification function, wrap it here
+    // try { await sendNotification(); } catch (e) { console.log("Email blocked by network."); }
+
     console.log("🏁 [SYSTEM] MEGA-SYNC COMPLETE.");
   } catch (err) {
     console.error("❌ MASTER SYNC FAILED:", err.message);
