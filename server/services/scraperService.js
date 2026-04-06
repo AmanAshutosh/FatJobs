@@ -3,15 +3,17 @@ const Job = require("../models/Job");
 
 const JSEARCH_API_KEY = process.env.JSEARCH_API_KEY;
 
-// 1. FILTERS (Strict Tech Only)
+// 1. FILTERS (Broadened to ensure roles are captured)
+// Removed the strict \b boundaries on some terms to catch variations
 const ALLOWED_ROLES =
-  /\b(software\s*engineer|sde|frontend|backend|fullstack|data\s*analyst|analytics|business\s*analyst|bi\s*analyst|data\s*scientist|web\s*developer|react\s*developer|java\s*developer|python\s*developer)\b/i;
+  /(software|sde|frontend|backend|fullstack|data\s*analyst|analytics|business\s*analyst|bi\s*analyst|data\s*scientist|web\s*developer|react|node|python|java)/i;
 const BANNED_KEYWORDS =
-  /\b(mis|officer|sales|relationship|trainee|graduate|intern|support|hr|marketing|operations|finance|accountant|executive|call\s*center|bpo)\b/i;
+  /\b(mis|officer|sales|relationship|trainee|support|hr|marketing|operations|finance|accountant|executive|call\s*center|bpo)\b/i;
 
 const isStrictTechRole = (title) => {
   if (!title) return false;
   const t = title.toLowerCase();
+  // Ensure it's an allowed role and NOT a banned one
   return ALLOWED_ROLES.test(t) && !BANNED_KEYWORDS.test(t);
 };
 
@@ -21,16 +23,20 @@ const extractExactExp = (text) => {
   return match ? match[0].trim() : "Not Specified";
 };
 
-// Helper for Database Upsert (Added Error Logging)
+// 2. FIXED: Helper for Database Upsert (Removed Deprecation Warnings)
 const upsertJob = async (link, data) => {
   try {
-    await Job.findOneAndUpdate({ link }, data, { upsert: true, new: true });
+    // Mongoose fix: Use returnDocument instead of 'new'
+    await Job.findOneAndUpdate({ link }, data, {
+      upsert: true,
+      returnDocument: "after",
+    });
   } catch (err) {
     console.error(`DB Error for ${data.company}:`, err.message);
   }
 };
 
-// 2. GREENHOUSE SOURCE
+// 3. GREENHOUSE SOURCE
 const GREENHOUSE_COMPANIES = [
   "binance",
   "razorpay",
@@ -44,8 +50,7 @@ const GREENHOUSE_COMPANIES = [
   "meesho",
   "zepto",
   "blinkit",
-  "phonepe",
-  "zomato",
+  "phonepe", // Removed Zomato as it's blocking requests
 ];
 
 const scrapeGreenhouse = async () => {
@@ -57,6 +62,10 @@ const scrapeGreenhouse = async () => {
         { timeout: 10000 },
       );
       const jobs = res.data.jobs || [];
+
+      console.log(
+        `🔍 ${company.toUpperCase()}: Found ${jobs.length} total roles.`,
+      );
 
       for (const j of jobs) {
         if (!isStrictTechRole(j.title)) continue;
@@ -86,16 +95,19 @@ const scrapeGreenhouse = async () => {
   }
 };
 
-// 3. JSEARCH SOURCE (Optimized for Quota)
+// 4. JSEARCH SOURCE
 const JSEARCH_QUERIES = [
-  "Software Engineer jobs India",
-  "Data Analyst roles India",
-  "SDE React Node jobs India",
-  "Fullstack Developer India",
+  "Software Engineer India",
+  "Data Analyst India",
+  "SDE React Node Developer India",
+  "Backend Developer Java Python India",
 ];
 
 const scrapeJSearch = async () => {
-  if (!JSEARCH_API_KEY) return;
+  if (!JSEARCH_API_KEY) {
+    console.log("❌ No JSearch API Key found in ENV.");
+    return;
+  }
 
   const randomQuery =
     JSEARCH_QUERIES[Math.floor(Math.random() * JSEARCH_QUERIES.length)];
@@ -117,6 +129,8 @@ const scrapeJSearch = async () => {
     });
 
     const jobs = res.data?.data || [];
+    console.log(`🔍 JSearch: Found ${jobs.length} roles for current query.`);
+
     for (const j of jobs) {
       if (!isStrictTechRole(j.job_title)) continue;
 
@@ -137,11 +151,11 @@ const scrapeJSearch = async () => {
       await upsertJob(jobData.link, jobData);
     }
   } catch (e) {
-    console.error("🔴 JSearch Error: Likely Quota Limit or Network Timeout");
+    console.error("🔴 JSearch Error: API Limit reached or timeout.");
   }
 };
 
-// 4. MASTER SYNC
+// 5. MASTER SYNC
 const scrapeJobs = async () => {
   console.log("🚀 [SYSTEM] MEGA-SYNC STARTING...");
 
