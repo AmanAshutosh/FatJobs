@@ -33,13 +33,31 @@ mongoose
   .then(() => {
     console.log("✅ Cloud Database Linked!");
 
-    // FIXED: Changed from 5 minutes to 12 hours (Twice a day)
-    // Running every 5 minutes will burn through your API key in 1 hour.
-    nodeCron.schedule("0 */12 * * *", () => {
-      console.log("⏰ 12-Hour Mark: Syncing Jobs...");
-      scrapeJobs().catch((err) =>
-        console.log("Scrape error ignored:", err.message),
+    // TASK 1: EVERY 2 HOURS (FREE)
+    // Greenhouse (Binance, PhonePe, etc.) is free. Run it often to catch roles!
+    nodeCron.schedule("0 */2 * * *", async () => {
+      console.log("⏰ 2-Hour Mark: Syncing Direct Company Boards...");
+      try {
+        // You'll need to export scrapeGreenhouse specifically in scraperService.js
+        const { scrapeGreenhouse } = require("./services/scraperService");
+        await scrapeGreenhouse();
+      } catch (err) {
+        console.log("Greenhouse sync error:", err.message);
+      }
+    });
+
+    // TASK 2: ONCE A DAY (PAID/LIMITED)
+    // JSearch (LinkedIn/Indeed aggregator) has a 20-req limit. Run it once at midnight.
+    nodeCron.schedule("0 0 * * *", async () => {
+      console.log(
+        "⏰ Daily Midnight Sync: Fetching Aggregator Roles (JSearch)...",
       );
+      try {
+        const { scrapeJSearch } = require("./services/scraperService");
+        await scrapeJSearch();
+      } catch (err) {
+        console.log("JSearch sync error:", err.message);
+      }
     });
 
     app.listen(PORT, "0.0.0.0", () => {

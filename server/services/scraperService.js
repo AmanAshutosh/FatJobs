@@ -3,15 +3,16 @@ const Job = require("../models/Job");
 
 const JSEARCH_API_KEY = process.env.JSEARCH_API_KEY;
 
-// 1. FILTERS (Broadened to ensure roles are captured)
+// 1. IMPROVED FILTERS: Added intern, fresher, junior, and associate
 const ALLOWED_ROLES =
-  /(software|sde|frontend|backend|fullstack|data\s*analyst|analytics|scientist|developer|react|node|android|ios|python|java|staff|principal)/i;
+  /(software|sde|frontend|backend|fullstack|data\s*analyst|analytics|scientist|developer|react|node|android|ios|python|java|staff|principal|intern|fresher|graduate|associate|junior)/i;
 const BANNED_KEYWORDS =
   /\b(mis|officer|sales|relationship|trainee|support|hr|marketing|operations|finance|accountant|executive|call\s*center|bpo)\b/i;
 
 const isStrictTechRole = (title) => {
   if (!title) return false;
   const t = title.toLowerCase();
+  // Filter: Must be an allowed role but NOT contain banned keywords
   return ALLOWED_ROLES.test(t) && !BANNED_KEYWORDS.test(t);
 };
 
@@ -21,7 +22,6 @@ const extractExactExp = (text) => {
   return match ? match[0].trim() : "Not Specified";
 };
 
-// 2. FIXED: Removed Deprecation Warnings & Handled Network Timeouts
 const upsertJob = async (link, data) => {
   try {
     await Job.findOneAndUpdate({ link }, data, {
@@ -33,7 +33,7 @@ const upsertJob = async (link, data) => {
   }
 };
 
-// 3. GREENHOUSE SOURCE (Added PhonePe & Zomato cleanup)
+// 3. EXPANDED GREENHOUSE LIST (Unlimited Free Data)
 const GREENHOUSE_COMPANIES = [
   "binance",
   "razorpay",
@@ -48,6 +48,12 @@ const GREENHOUSE_COMPANIES = [
   "zepto",
   "blinkit",
   "phonepe",
+  "zomato",
+  "swiggy",
+  "unacademy",
+  "upstox",
+  "urbancompany",
+  "airtel",
 ];
 
 const scrapeGreenhouse = async () => {
@@ -56,7 +62,7 @@ const scrapeGreenhouse = async () => {
     try {
       const res = await axios.get(
         `https://boards-api.greenhouse.io/v1/boards/${company}/jobs?content=true`,
-        { timeout: 8000 }, // Slightly shorter timeout to keep the loop moving
+        { timeout: 10000 },
       );
       const jobs = res.data.jobs || [];
 
@@ -77,45 +83,38 @@ const scrapeGreenhouse = async () => {
             ? "Remote/Hybrid"
             : "On-site",
           location: j.location?.name || "India",
-          postedAt: new Date(j.updated_at || j.first_published),
+          postedAt: new Date(j.updated_at || j.first_published || Date.now()),
         };
 
         await upsertJob(jobData.link, jobData);
       }
     } catch (e) {
-      console.log(`⚠️ Skipping ${company}: Board currently unreachable.`);
+      console.log(`⚠️ Skipping ${company}: Board unreachable.`);
     }
   }
 };
 
-// 4. JSEARCH SOURCE
-const JSEARCH_QUERIES = [
-  "Software Engineer India",
-  "Data Analyst India",
-  "SDE React Node Developer India",
-  "Backend Developer Java Python India",
-];
-
+// 4. JSEARCH SOURCE (Limited API - Used Strategically)
 const scrapeJSearch = async () => {
   if (!JSEARCH_API_KEY) return;
 
-  const randomQuery =
-    JSEARCH_QUERIES[Math.floor(Math.random() * JSEARCH_QUERIES.length)];
-  console.log(`🔵 Starting JSearch Scrape for: ${randomQuery}`);
+  // We cycle through queries to get variety without burning credits
+  const query = "Software Engineer Data Analyst Freshers India";
+  console.log(`🔵 Starting JSearch Strategic Scrape...`);
 
   try {
     const res = await axios.get("https://jsearch.p.rapidapi.com/search", {
       params: {
-        query: randomQuery,
+        query: query,
         page: "1",
         num_pages: "1",
-        date_posted: "3days",
+        date_posted: "week", // Changed to week to get more volume
       },
       headers: {
         "X-RapidAPI-Key": JSEARCH_API_KEY,
         "X-RapidAPI-Host": "jsearch.p.rapidapi.com",
       },
-      timeout: 12000,
+      timeout: 15000,
     });
 
     const jobs = res.data?.data || [];
@@ -139,27 +138,20 @@ const scrapeJSearch = async () => {
       await upsertJob(jobData.link, jobData);
     }
   } catch (e) {
-    console.error("🔴 JSearch Error: API Limit reached or timeout.");
+    console.error("🔴 JSearch Error: API Limit reached.");
   }
 };
 
-// 5. MASTER SYNC
 const scrapeJobs = async () => {
   console.log("🚀 [SYSTEM] MEGA-SYNC STARTING...");
-
   try {
     await scrapeGreenhouse();
     await scrapeJSearch();
 
-    // Retention: 14 Days
+    // Retention: 14 Days (Keep the DB fresh)
     const cutoff = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000);
     const deleted = await Job.deleteMany({ postedAt: { $lt: cutoff } });
-
     console.log(`🧹 Cleanup: Removed ${deleted.deletedCount} old jobs.`);
-
-    // FAIL-SAFE: If you have an email notification function, wrap it here
-    // try { await sendNotification(); } catch (e) { console.log("Email blocked by network."); }
-
     console.log("🏁 [SYSTEM] MEGA-SYNC COMPLETE.");
   } catch (err) {
     console.error("❌ MASTER SYNC FAILED:", err.message);
