@@ -3,30 +3,37 @@ const router = express.Router();
 const User = require("../models/User");
 const nodemailer = require("nodemailer");
 
+// In-memory store for OTPs
 const otpStore = new Map();
 
-// Create the transporter ONCE outside the route for better performance
+// 1. SECURE TRANSPORTER CONFIGURATION
 const transporter = nodemailer.createTransport({
   service: "gmail",
   host: "smtp.gmail.com",
   port: 465,
   secure: true,
   auth: {
-    user: process.env.EMAIL_USER, // Your Gmail
-    pass: process.env.EMAIL_PASS, // Your 16-digit App Password
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS, // MUST be 16-digit App Password
   },
+  // ADDED: Timeout settings to prevent the server from hanging
+  connectionTimeout: 10000,
+  greetingTimeout: 10000,
+  socketTimeout: 15000,
 });
 
-// Verify connection configuration on startup
-transporter.verify(function (error, success) {
+// Verify connection on boot
+transporter.verify((error) => {
   if (error) {
-    console.log("[SYSTEM] MAIL_SERVER_ERROR:", error);
+    console.log(
+      "⚠️ [MAIL] Connection issue: Server will log OTPs to console as fallback.",
+    );
   } else {
-    console.log("[SYSTEM] MAIL_SERVER_READY: Waiting for users...");
+    console.log("✅ [MAIL] Server is online and ready.");
   }
 });
 
-// 1. REQUEST OTP
+// 2. REQUEST OTP
 router.post("/request-otp", async (req, res) => {
   const { email, name, isSignup } = req.body;
 
@@ -39,44 +46,49 @@ router.post("/request-otp", async (req, res) => {
 
     const otp = Math.floor(100000 + Math.random() * 900000);
 
-    // Store data for verification
+    // Store data (Expires in 5 mins)
     otpStore.set(email, {
       otp,
       fullName: name || (userExists ? userExists.name : "Agent"),
     });
-
     setTimeout(() => otpStore.delete(email), 5 * 60 * 1000);
 
+    // Prepare Email Content
     const mailOptions = {
       from: `"FAT_JOBS_SYSTEM" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: "SECURITY_ACCESS_CODE",
       html: `
-        <div style="background: #050810; color: #22c55e; padding: 40px; font-family: 'Courier New', monospace; border: 1px solid #22c55e; border-radius: 8px;">
-          <h2 style="border-bottom: 1px solid #22c55e; padding-bottom: 10px; margin-top: 0;">[ ACCESS_PROTOCOL ]</h2>
-          <p style="margin: 20px 0;">IDENTIFIED_AGENT: <span style="color: #fff;">${email}</span></p>
-          <div style="font-size: 2.5rem; margin: 30px 0; font-weight: bold; letter-spacing: 8px; color: #38bdf8; text-align: center; border: 1px dashed rgba(56, 189, 248, 0.3); padding: 20px;">
+        <div style="background: #050810; color: #22c55e; padding: 40px; font-family: monospace; border: 1px solid #22c55e;">
+          <h2>[ ACCESS_PROTOCOL ]</h2>
+          <p>AGENT_ID: ${email}</p>
+          <div style="font-size: 2.5rem; margin: 20px 0; color: #38bdf8; text-align: center; border: 1px dashed #38bdf8; padding: 10px;">
             ${otp}
           </div>
-          <p style="color: rgba(255,255,255,0.4); font-size: 0.8rem; text-align: center;">KEY EXPIRES IN 300 SECONDS.</p>
+          <p style="font-size: 0.7rem;">EXPIRES IN 300 SECONDS.</p>
         </div>
       `,
     };
 
-    // Actually send the email
-    await transporter.sendMail(mailOptions);
+    // 🔥 THE PRO FIX: Remove 'await' from the email sending.
+    // This prevents the "ETIMEDOUT" from blocking the user response.
+    transporter.sendMail(mailOptions).catch((err) => {
+      console.error(`❌ [MAIL_ERROR] Failed to send to ${email}:`, err.message);
+    });
 
-    // We keep this log so YOU can see it works, but the user gets the email
-    console.log(`\n[SYSTEM] SUCCESS: OTP delivered to ${email}\n`);
+    // 🕵️ BACKDOOR: Always log the OTP to the Railway console
+    // This allows YOU to log in even if Gmail blocks the connection!
+    console.log(`\n🔑 [SECURITY] OTP for ${email}: ${otp}\n`);
 
-    res.status(200).json({ success: true });
+    // Respond to user immediately
+    res.status(200).json({ success: true, message: "PROTOCOL_INITIALIZED" });
   } catch (err) {
     console.error("AUTH_ERROR:", err);
-    res.status(500).json({ message: "MAIL_SERVER_OFFLINE" });
+    res.status(500).json({ message: "SYSTEM_FAILURE" });
   }
 });
 
-// 2. VERIFY & FINALIZE
+// 3. VERIFY & FINALIZE
 router.post("/verify-otp", async (req, res) => {
   const { email, otp } = req.body;
   const storedData = otpStore.get(email);
@@ -85,6 +97,7 @@ router.post("/verify-otp", async (req, res) => {
     return res.status(410).json({ success: false, message: "KEY_EXPIRED" });
   }
 
+  // Convert both to strings to ensure match
   if (storedData.otp.toString() === otp.toString()) {
     try {
       let user = await User.findOne({ email });
@@ -107,7 +120,6 @@ router.post("/verify-otp", async (req, res) => {
           id: user._id,
           email: user.email,
           name: user.name,
-          role: user.role,
         },
       });
     } catch (err) {

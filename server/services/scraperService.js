@@ -4,6 +4,7 @@ const Job = require("../models/Job");
 const JSEARCH_API_KEY = process.env.JSEARCH_API_KEY;
 
 // 1. IMPROVED FILTERS: Added intern, fresher, junior, and associate
+// BROADENED: Added intern, graduate, and fresher to catch LinkedIn's entry-level roles
 const ALLOWED_ROLES =
   /(software|sde|frontend|backend|fullstack|data\s*analyst|analytics|scientist|developer|react|node|android|ios|python|java|staff|principal|intern|fresher|graduate|associate|junior)/i;
 const BANNED_KEYWORDS =
@@ -54,6 +55,17 @@ const GREENHOUSE_COMPANIES = [
   "upstox",
   "urbancompany",
   "airtel",
+  "cred",
+  "curefit",
+  "dream11",
+  "games24x7",
+  "postman",
+  "nykaa",
+  "delivery",
+  "inmobi",
+  "paytm",
+  "ola",
+  "oyo",
 ];
 
 const scrapeGreenhouse = async () => {
@@ -159,3 +171,5 @@ const scrapeJobs = async () => {
 };
 
 module.exports = { scrapeJobs };
+module.exports = { scrapeGreenhouse };
+module.exports = { scrapeJSearch };
