@@ -10,6 +10,8 @@ const UserSchema = new mongoose.Schema(
     savedJobs: [{ type: mongoose.Schema.Types.ObjectId, ref: "Job" }],
     appliedJobs: [{ type: mongoose.Schema.Types.ObjectId, ref: "Job" }],
     profileStrength: { type: Number, default: 50 },
+    otpAttempts: { type: Number, default: 0 },
+    lastOtpRequest: { type: Date, default: Date.now },
   },
   { timestamps: true },
 );

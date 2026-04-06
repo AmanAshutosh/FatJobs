@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../styles/Auth.css";
 
-// Centralized API URL to avoid "Connection Refused" on mobile
 const API_BASE_URL = "https://fatjobs-production.up.railway.app";
 
 const Auth = ({ setUser, onNavigate }) => {
@@ -13,49 +12,43 @@ const Auth = ({ setUser, onNavigate }) => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const [emailWidth, setEmailWidth] = useState(0);
-  const [nameWidth, setNameWidth] = useState(0);
+  // 🕒 Timer State
+  const [timer, setTimer] = useState(0);
 
-  const handleInputChange = (e, field, setWidth) => {
-    const value = e.target.value;
-    setFormData({ ...formData, [field]: value });
+  // Countdown logic for the Resend button
+  useEffect(() => {
+    let interval;
+    if (timer > 0) {
+      interval = setInterval(() => {
+        setTimer((prev) => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [timer]);
 
-    const span = document.createElement("span");
-    span.style.font = "1.1rem 'Courier New', monospace";
-    span.style.visibility = "hidden";
-    span.style.position = "absolute";
-    span.style.whiteSpace = "pre";
-    span.innerText = value;
-    document.body.appendChild(span);
-    setWidth(span.offsetWidth);
-    document.body.removeChild(span);
+  const handleInputChange = (e, field) => {
+    setFormData({ ...formData, [field]: e.target.value });
   };
 
   const handleRequest = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     setLoading(true);
     setError("");
     try {
-      // ✅ FIXED: Using Production Railway URL
       await axios.post(`${API_BASE_URL}/api/auth/request-otp`, {
         email: formData.email,
         name: formData.name,
         isSignup,
       });
       setStep(2);
+      setTimer(60); // Start 60s countdown
       setOtp("");
     } catch (err) {
       const serverMessage = err.response?.data?.message;
-
-      if (serverMessage === "IDENTITY_ALREADY_REGISTERED") {
-        setError("IDENTITY_ALREADY_REGISTERED");
-      } else if (serverMessage === "IDENTITY_NOT_FOUND") {
-        setError("IDENTITY_NOT_FOUND: PLEASE_SIGNUP_FIRST");
-      } else if (serverMessage === "MAIL_SERVER_OFFLINE") {
-        // Even if mail fails, we check Railway logs for the OTP
-        setError("SMTP_PROTOCOL_FAILURE: CHECK_SYSTEM_LOGS_FOR_KEY");
+      if (serverMessage === "LIMIT_EXCEEDED: MAXIMUM_5_KEYS_PER_24H") {
+        setError("SECURITY_LOCK: MAX_ATTEMPTS_REACHED_FOR_24H");
       } else {
-        setError("SYSTEM_OFFLINE: UNABLE_TO_REACH_CORE");
+        setError(serverMessage || "SYSTEM_OFFLINE");
       }
     } finally {
       setLoading(false);
@@ -66,11 +59,9 @@ const Auth = ({ setUser, onNavigate }) => {
     e.preventDefault();
     setLoading(true);
     try {
-      // ✅ FIXED: Using Production Railway URL
       const res = await axios.post(`${API_BASE_URL}/api/auth/verify-otp`, {
         email: formData.email,
         otp,
-        isSignup,
       });
       if (res.data.success) {
         localStorage.setItem("fatjobs_user", JSON.stringify(res.data.user));
@@ -88,110 +79,73 @@ const Auth = ({ setUser, onNavigate }) => {
     <div className="auth-terminal-container">
       <div className="terminal-window">
         <div className="terminal-header">
-          <span>
-            {isSignup
-              ? "NEW_IDENTITY_PROVISIONING.exe"
-              : "SECURE_LOGIN_v2.0.sh"}
-          </span>
+          <span>{isSignup ? "PROVISIONING.exe" : "LOGIN_v2.sh"}</span>
           <span>● ● ●</span>
         </div>
         <div className="terminal-body">
-          <p className="command-line">
-            {isSignup
-              ? "> INITIALIZING SIGNUP PROTOCOL..."
-              : "> RESUMING CAREER_SYNC..."}
-          </p>
-
           {step === 1 ? (
             <form onSubmit={handleRequest} className="terminal-form">
               {isSignup && (
                 <div className="auth-form-group">
                   <p className="prompt">FULL_NAME:</p>
-                  <div className="terminal-input-wrapper">
-                    <input
-                      className="terminal-input"
-                      required
-                      name="fullname"
-                      autoComplete="name"
-                      placeholder="John Doe"
-                      onChange={(e) =>
-                        handleInputChange(e, "name", setNameWidth)
-                      }
-                    />
-                    <span
-                      className="custom-blinker"
-                      style={{ transform: `translateX(${nameWidth}px)` }}
-                    ></span>
-                  </div>
+                  <input
+                    className="terminal-input"
+                    required
+                    onChange={(e) => handleInputChange(e, "name")}
+                  />
                 </div>
               )}
               <div className="auth-form-group">
                 <p className="prompt">EMAIL_ADDRESS:</p>
-                <div className="terminal-input-wrapper">
-                  <input
-                    className="terminal-input"
-                    type="email"
-                    required
-                    name="email"
-                    autoComplete="email"
-                    placeholder="dev@fatjobs.com"
-                    onChange={(e) =>
-                      handleInputChange(e, "email", setEmailWidth)
-                    }
-                  />
-                  <span
-                    className="custom-blinker"
-                    style={{ transform: `translateX(${emailWidth}px)` }}
-                  ></span>
-                </div>
+                <input
+                  className="terminal-input"
+                  type="email"
+                  required
+                  onChange={(e) => handleInputChange(e, "email")}
+                />
               </div>
-              <button type="submit" className="grant-access-btn">
+              <button
+                type="submit"
+                className="grant-access-btn"
+                disabled={loading}
+              >
                 {loading ? "TRANSMITTING..." : "[ GENERATE_ACCESS_KEY ]"}
               </button>
             </form>
           ) : (
             <form onSubmit={handleVerify} className="terminal-form">
-              <div className="auth-form-group">
-                <p className="prompt">ENTER_6_DIGIT_KEY:</p>
-                <div className="terminal-input-wrapper">
-                  <input
-                    className="terminal-input code-input"
-                    maxLength="6"
-                    autoFocus
-                    required
-                    name="otp-input"
-                    autoComplete="one-time-code"
-                    placeholder="000000"
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value)}
-                  />
-                </div>
+              <p className="prompt">ENTER_6_DIGIT_KEY:</p>
+              <input
+                className="terminal-input code-input"
+                maxLength="6"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                autoFocus
+              />
+
+              <p className="spam-hint">!! CHECK_INBOX_OR_SPAM_FOLDER !!</p>
+
+              <div className="resend-container">
+                {timer > 0 ? (
+                  <p className="timer-text">RESEND_AVAILABLE_IN: {timer}s</p>
+                ) : (
+                  <span className="resend-link" onClick={handleRequest}>
+                    {"> RE-GENERATE_ACCESS_KEY"}
+                  </span>
+                )}
               </div>
-              <button type="submit" className="grant-access-btn">
+
+              <button
+                type="submit"
+                className="grant-access-btn"
+                style={{ marginTop: "20px" }}
+              >
                 {loading ? "VERIFYING..." : "[ AUTHORIZE_ACCESS ]"}
               </button>
             </form>
           )}
 
           {error && <p className="error-text">!! {error} !!</p>}
-
-          <div className="terminal-footer">
-            <span
-              className="toggle-text"
-              onClick={() => {
-                setIsSignup(!isSignup);
-                setStep(1);
-                setError("");
-                setEmailWidth(0);
-                setNameWidth(0);
-                setFormData({ email: "", name: "" });
-              }}
-            >
-              {isSignup
-                ? "> ALREADY_HAVE_ACCESS? _LOGIN"
-                : "> NEW_USER? _CREATE_ACCOUNT"}
-            </span>
-          </div>
         </div>
       </div>
     </div>

@@ -12,19 +12,46 @@ router.post("/request-otp", async (req, res) => {
   const { email, name, isSignup } = req.body;
 
   try {
-    const userExists = await User.findOne({ email });
-    if (!isSignup && !userExists) {
+    let user = await User.findOne({ email });
+
+    // --- 🛡️ RATE LIMITING LOGIC (5 ATTEMPTS / 24 HRS) ---
+    if (user) {
+      const now = new Date();
+      const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+
+      // Reset count if the last request was more than 24 hours ago
+      if (user.lastOtpRequest < oneDayAgo) {
+        user.otpAttempts = 0;
+      }
+
+      // Check if limit is reached
+      if (user.otpAttempts >= 5) {
+        return res.status(429).json({
+          message: "LIMIT_EXCEEDED: MAXIMUM_5_KEYS_PER_24H",
+        });
+      }
+
+      // Update attempt count and timestamp
+      user.otpAttempts += 1;
+      user.lastOtpRequest = now;
+      await user.save();
+    }
+    // --- END RATE LIMITING ---
+
+    if (!isSignup && !user) {
       return res.status(404).json({ message: "IDENTITY_NOT_FOUND" });
     }
 
     const otp = Math.floor(100000 + Math.random() * 900000);
+
     otpStore.set(email, {
       otp,
-      fullName: name || (userExists ? userExists.name : "Agent"),
+      fullName: name || (user ? user.name : "Agent"),
     });
+
+    // OTP remains valid for 5 minutes
     setTimeout(() => otpStore.delete(email), 5 * 60 * 1000);
 
-    // 🔥 THE PRODUCTION FIX: Using Resend HTTP API
     const { data, error } = await resend.emails.send({
       from: "FatJobs <onboarding@resend.dev>",
       to: email,
@@ -33,17 +60,17 @@ router.post("/request-otp", async (req, res) => {
         <div style="background: #050810; color: #22c55e; padding: 40px; font-family: monospace; border: 1px solid #22c55e;">
           <h2>[ ACCESS_PROTOCOL ]</h2>
           <p>AGENT_ID: ${email}</p>
-          <div style="font-size: 2.5rem; margin: 20px 0; color: #38bdf8; text-align: center; border: 1px dashed #38bdf8; padding: 10px;">
+          <div style="font-size: 2.5rem; margin: 30px 0; color: #38bdf8; text-align: center; border: 1px dashed #38bdf8; padding: 10px;">
             ${otp}
           </div>
           <p style="font-size: 0.7rem;">EXPIRES IN 300 SECONDS.</p>
+          <p style="font-size: 0.6rem; color: #666;">Note: Max 5 keys allowed per 24-hour cycle.</p>
         </div>
       `,
     });
 
     if (error) {
       console.error("❌ [RESEND_ERROR]:", error);
-      // Fallback: Still log to console so YOU can see it in Railway logs
       console.log(`🔑 [BACKDOOR] OTP for ${email}: ${otp}`);
       return res.status(500).json({ message: "MAIL_SERVER_OFFLINE" });
     }
@@ -56,7 +83,7 @@ router.post("/request-otp", async (req, res) => {
   }
 });
 
-// 2. VERIFY & FINALIZE (Same as before)
+// 2. VERIFY & FINALIZE
 router.post("/verify-otp", async (req, res) => {
   const { email, otp } = req.body;
   const storedData = otpStore.get(email);
@@ -74,10 +101,14 @@ router.post("/verify-otp", async (req, res) => {
           name: storedData.fullName || "New Agent",
           role: "Full-Stack Developer",
           location: "India",
+          otpAttempts: 1, // Start count for new users
+          lastOtpRequest: new Date(),
         });
         await user.save();
       }
+
       otpStore.delete(email);
+
       res.status(200).json({
         success: true,
         user: { id: user._id, email: user.email, name: user.name },
