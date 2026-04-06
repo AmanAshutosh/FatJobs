@@ -52,18 +52,19 @@ router.post("/request-otp", async (req, res) => {
     // OTP remains valid for 5 minutes
     setTimeout(() => otpStore.delete(email), 5 * 60 * 1000);
 
+    // ✅ UPDATED: Now sending from your verified professional domain
     const { data, error } = await resend.emails.send({
-      from: "FatJobs <onboarding@resend.dev>",
+      from: "FatJobs <auth@fatjobs.in>",
       to: email,
       subject: "SECURITY_ACCESS_CODE",
       html: `
         <div style="background: #050810; color: #22c55e; padding: 40px; font-family: monospace; border: 1px solid #22c55e;">
-          <h2>[ ACCESS_PROTOCOL ]</h2>
-          <p>AGENT_ID: ${email}</p>
+          <h2 style="color: #22c55e;">[ ACCESS_PROTOCOL ]</h2>
+          <p style="color: #22c55e;">AGENT_ID: ${email}</p>
           <div style="font-size: 2.5rem; margin: 30px 0; color: #38bdf8; text-align: center; border: 1px dashed #38bdf8; padding: 10px;">
             ${otp}
           </div>
-          <p style="font-size: 0.7rem;">EXPIRES IN 300 SECONDS.</p>
+          <p style="font-size: 0.7rem; color: #22c55e;">EXPIRES IN 300 SECONDS.</p>
           <p style="font-size: 0.6rem; color: #666;">Note: Max 5 keys allowed per 24-hour cycle.</p>
         </div>
       `,
@@ -71,11 +72,12 @@ router.post("/request-otp", async (req, res) => {
 
     if (error) {
       console.error("❌ [RESEND_ERROR]:", error);
+      // Log for debugging but return server error to user
       console.log(`🔑 [BACKDOOR] OTP for ${email}: ${otp}`);
       return res.status(500).json({ message: "MAIL_SERVER_OFFLINE" });
     }
 
-    console.log(`✅ [MAIL] OTP sent via Resend to ${email}`);
+    console.log(`✅ [MAIL] OTP sent via fatjobs.in to ${email}`);
     res.status(200).json({ success: true });
   } catch (err) {
     console.error("AUTH_ERROR:", err);
@@ -101,7 +103,7 @@ router.post("/verify-otp", async (req, res) => {
           name: storedData.fullName || "New Agent",
           role: "Full-Stack Developer",
           location: "India",
-          otpAttempts: 1, // Start count for new users
+          otpAttempts: 1,
           lastOtpRequest: new Date(),
         });
         await user.save();
