@@ -67,28 +67,16 @@
 }
 
 /* GREEN: Under 24 hours (NEW) */
-.status-pulse.hot { 
-  background-color: #22c55e; 
-  animation: pulse-green 2s infinite; 
-}
+.status-pulse.hot { background-color: #22c55e; animation: pulse-green 2s infinite; } /* Green */
 
 /* ORANGE: 24-48 hours (RECENT) */
-.status-pulse.warm { 
-  background-color: #f97316; 
-  animation: pulse-orange 2s infinite; 
-}
+.status-pulse.warm { background-color: #f97316; animation: pulse-orange 2s infinite; } /* Orange */
 
 /* RED: 48-72 hours (URGENT) */
-.status-pulse.urgent { 
-  background-color: #ef4444; 
-  animation: pulse-red 2s infinite; 
-}
+.status-pulse.urgent { background-color: #ef4444; animation: pulse-red 2s infinite; } /* Red */
 
 /* BLUE/GREY: Older than 72 hours (ARCHIVED) */
-.status-pulse.cold {
-  background-color: #94a3b8;
-  box-shadow: none;
-}
+.status-pulse.cold { background-color: #94a3b8; } /* Grey */
 
 /* KEYFRAMES FOR PULSING */
 @keyframes pulse-green {
