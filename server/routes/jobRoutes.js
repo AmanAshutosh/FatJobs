@@ -1,80 +1,120 @@
-const express = require("express");
-const router = express.Router();
-const Job = require("../models/Job");
-const { scrapeJobs } = require("../services/scraperService");
+import React, { useMemo } from "react";
+import "../styles/JobCard.css";
 
-/**
- * @route   GET /api/sync
- * @desc    Manual trigger for the scraper.
- * In production, we use GET so we can hit it via a Cron Monitoring tool.
- */
-router.get("/sync", async (req, res) => {
-  try {
-    // Fire and forget - the scraper runs as a background process
-    scrapeJobs();
+const JobCard = ({ job }) => {
+  const jobStats = useMemo(() => {
+    // 1. FAIL-SAFE DATE SELECTION
+    // We try postedAt, then createdAt, then fallback to "Now" to prevent crashing
+    const rawDate = job.postedAt || job.createdAt || new Date();
+    const jobDate = new Date(rawDate);
 
-    return res.status(202).json({
-      success: true,
-      message: "SYNC_SEQUENCE_STARTED",
-      timestamp: new Date().toISOString(),
-    });
-  } catch (err) {
-    console.error(">>> [CRITICAL] SYNC_TRIGGER_ERROR:", err);
-    return res
-      .status(500)
-      .json({ success: false, error: "INTERNAL_SYNC_FAILURE" });
-  }
-});
+    // Check if the date is actually valid
+    const isValidDate = !isNaN(jobDate.getTime());
+    const now = new Date();
+    const diffInHours = isValidDate
+      ? (now - jobDate.getTime()) / (1000 * 60 * 60)
+      : 999;
 
-/**
- * @route   GET /api/jobs
- * @desc    Fetch jobs with dynamic filtering, pagination-ready, and cache-busting.
- */
-router.get("/jobs", async (req, res) => {
-  try {
-    const { category } = req.query;
+    let sClass = "status-pulse";
+    let label = "ACTIVE";
 
-    // 1. DYNAMIC QUERY BUILDING
-    // We remove the 7-day restriction here.
-    // The ScraperService already deletes jobs older than 14 days,
-    // so we should show EVERYTHING currently in the database.
-    let query = {};
-
-    // 2. CASE-INSENSITIVE CATEGORY FILTERING
-    if (category) {
-      // Matches "SDE" or "sde" or "DA" or "da" exactly
-      query.category = { $regex: new RegExp(`^${category}$`, "i") };
+    // 2. THE 24/48/72 LOGIC (Strictly for Pulse Color)
+    if (diffInHours <= 24) {
+      sClass += " hot"; // Green
+      label = "NEW";
+    } else if (diffInHours <= 48) {
+      sClass += " warm"; // Orange
+      label = "RECENT";
+    } else if (diffInHours <= 72) {
+      sClass += " urgent"; // Red
+      label = "URGENT";
+    } else {
+      sClass += " cold"; // Grey/Blue
+      label = "ARCHIVED";
     }
 
-    // 3. OPTIMIZED DATA FETCHING
-    // Lean() makes the query 5x faster because it returns plain JS objects, not Mongoose documents.
-    const jobs = await Job.find(query)
-      .sort({ postedAt: -1, createdAt: -1 })
-      .limit(500)
-      .lean();
+    // 3. FORMAT TIME (With Fallback for invalid dates)
+    const timeLabel = isValidDate
+      ? jobDate.toLocaleDateString([], { month: "short", day: "numeric" }) +
+        " | " +
+        jobDate.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true,
+        })
+      : "Recently Synced";
 
-    // 4. STARTUP-GRADE CACHE HEADERS
-    // Prevents browsers from showing stale data during rapid refreshes.
-    res.set({
-      "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
-      Pragma: "no-cache",
-      Expires: "0",
-    });
+    return { sClass, timeLabel, label };
+  }, [job.postedAt, job.createdAt]);
 
-    // Logging for Railway monitoring
-    console.log(
-      `[API] SUCCESS: Dispatched ${jobs.length} jobs for ${category || "ALL_CATEGORIES"}`,
-    );
+  // FINAL RENDER GUARD: Ensure we always return a DIV if the job exists
+  if (!job || !job.title) return null;
 
-    return res.status(200).json(jobs);
-  } catch (err) {
-    console.error(">>> [ERROR] JOB_FETCH_EXCEPTION:", err.stack);
-    return res.status(500).json({
-      success: false,
-      error: "DATA_RETRIEVAL_FAILED",
-      trace: process.env.NODE_ENV === "development" ? err.message : null,
-    });
-  }
-});
+  return (
+    <div className="trump-card-wrapper">
+      <div className="trump-card">
+        {/* HEADER */}
+        <div className="card-header">
+          <div className="card-name-role">
+            <h2 title={job.title}>{job.title}</h2>
+            <p className="card-platform-tag">
+              {job.platform?.toUpperCase() || "DIRECT"}
+            </p>
+          </div>
+          <div className="card-flag">
+            <div
+              className={jobStats.sClass}
+              title={`Status: ${jobStats.label}`}
+            ></div>
+          </div>
+        </div>
 
-module.exports = router;
+        {/* VISUAL SECTION */}
+        <div className="card-image-section">
+          <div className="image-circle">
+            <span className="title-preview">
+              {job.company?.charAt(0) || "J"}
+            </span>
+          </div>
+          <div className="rating-stars">★★★★★</div>
+        </div>
+
+        {/* STATS SECTION */}
+        <div className="card-stats">
+          <div className="stat-row">
+            <span className="stat-key">COMPANY</span>
+            <span className="stat-value">{job.company || "TECH CORP"}</span>
+          </div>
+          <div className="stat-row">
+            <span className="stat-key">EXPERIENCE</span>
+            <span className="stat-value">
+              {job.experience || "Not Specified"}
+            </span>
+          </div>
+          <div className="stat-row">
+            <span className="stat-key">LOCATION</span>
+            <span className="stat-value">{job.location || "India"}</span>
+          </div>
+          <div className="stat-row">
+            <span className="stat-key">POSTED AT</span>
+            <span className="stat-value">{jobStats.timeLabel}</span>
+          </div>
+        </div>
+
+        {/* FOOTER */}
+        <div className="card-footer">
+          <a
+            href={job.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="apply-file-button"
+          >
+            VIEW APPLY FILE
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default JobCard;
