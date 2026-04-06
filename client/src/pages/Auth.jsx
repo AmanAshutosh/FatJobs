@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import axios from "axios";
 import "../styles/Auth.css";
 
+// Centralized API URL to avoid "Connection Refused" on mobile
+const API_BASE_URL = "https://fatjobs-production.up.railway.app";
+
 const Auth = ({ setUser, onNavigate }) => {
   const [isSignup, setIsSignup] = useState(false);
   const [step, setStep] = useState(1);
@@ -33,25 +36,26 @@ const Auth = ({ setUser, onNavigate }) => {
     setLoading(true);
     setError("");
     try {
-      await axios.post("http://localhost:5000/api/auth/request-otp", {
+      // ✅ FIXED: Using Production Railway URL
+      await axios.post(`${API_BASE_URL}/api/auth/request-otp`, {
         email: formData.email,
         name: formData.name,
         isSignup,
       });
       setStep(2);
-      setOtp(""); // Ensure OTP state is fresh when moving to step 2
+      setOtp("");
     } catch (err) {
       const serverMessage = err.response?.data?.message;
 
-      // Fix 3: Handle specific backend errors instead of defaulting to Offline
       if (serverMessage === "IDENTITY_ALREADY_REGISTERED") {
         setError("IDENTITY_ALREADY_REGISTERED");
       } else if (serverMessage === "IDENTITY_NOT_FOUND") {
         setError("IDENTITY_NOT_FOUND: PLEASE_SIGNUP_FIRST");
       } else if (serverMessage === "MAIL_SERVER_OFFLINE") {
-        setError("SMTP_PROTOCOL_FAILURE: MAIL_SERVER_OFFLINE");
+        // Even if mail fails, we check Railway logs for the OTP
+        setError("SMTP_PROTOCOL_FAILURE: CHECK_SYSTEM_LOGS_FOR_KEY");
       } else {
-        setError("SYSTEM_OFFLINE: CONNECTION_REFUSED");
+        setError("SYSTEM_OFFLINE: UNABLE_TO_REACH_CORE");
       }
     } finally {
       setLoading(false);
@@ -62,21 +66,15 @@ const Auth = ({ setUser, onNavigate }) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/auth/verify-otp",
-        {
-          email: formData.email,
-          otp,
-          isSignup,
-        },
-      );
+      // ✅ FIXED: Using Production Railway URL
+      const res = await axios.post(`${API_BASE_URL}/api/auth/verify-otp`, {
+        email: formData.email,
+        otp,
+        isSignup,
+      });
       if (res.data.success) {
         localStorage.setItem("fatjobs_user", JSON.stringify(res.data.user));
-
-        // Fix 1: Update local state immediately before navigation
         setUser(res.data.user);
-
-        // Navigate to landing page
         onNavigate("/sde");
       }
     } catch (err) {
@@ -162,7 +160,6 @@ const Auth = ({ setUser, onNavigate }) => {
                     autoFocus
                     required
                     name="otp-input"
-                    // Fix 2: Prevent name/email autofill on the OTP field
                     autoComplete="one-time-code"
                     placeholder="000000"
                     value={otp}
@@ -187,7 +184,7 @@ const Auth = ({ setUser, onNavigate }) => {
                 setError("");
                 setEmailWidth(0);
                 setNameWidth(0);
-                setFormData({ email: "", name: "" }); // Reset form data on toggle
+                setFormData({ email: "", name: "" });
               }}
             >
               {isSignup
