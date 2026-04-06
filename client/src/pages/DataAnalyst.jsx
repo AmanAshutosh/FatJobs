@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import JobCard from "../components/JobCard";
+import API_URL from "../api";
 import "../styles/DataAnalyst.css";
 
 const DataAnalyst = () => {
@@ -9,12 +10,10 @@ const DataAnalyst = () => {
 
   const fetchDAJobs = useCallback(async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:5000/api/jobs?category=DA",
-      );
+      const response = await axios.get(`${API_URL}/api/jobs?category=DA`);
       setJobs(response.data);
     } catch (error) {
-      console.error("Fetch Error:", error);
+      console.error("❌ DA Fetch Error:", error);
     } finally {
       setLoading(false);
     }
@@ -22,10 +21,7 @@ const DataAnalyst = () => {
 
   useEffect(() => {
     fetchDAJobs();
-
-    // FIX #4: RE-SYNC WHEN USER RETURNS TO TAB
     window.addEventListener("focus", fetchDAJobs);
-
     return () => window.removeEventListener("focus", fetchDAJobs);
   }, [fetchDAJobs]);
 
@@ -37,7 +33,6 @@ const DataAnalyst = () => {
             <div className="da-badge-dot"></div>
             {jobs.length} LIVE DATA ROLES
           </div>
-
           <h1>DATA DECK</h1>
           <p>
             Real-time stream of Data Science and Analytics roles from top tech
@@ -56,8 +51,8 @@ const DataAnalyst = () => {
             <div className="coming-soon-box">
               <h3>Deck Empty</h3>
               <p>
-                The scraper is currently searching for new Data roles. Check
-                back in a few minutes.
+                Scanning global boards for new Data roles. Please refresh in a
+                moment.
               </p>
             </div>
           )}

@@ -1,36 +1,27 @@
 import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import JobCard from "../components/JobCard";
+import API_URL from "../api";
 import "../styles/SDE.css";
 
 const SDE = () => {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Memoized fetch function to prevent unnecessary re-renders
   const fetchSDE = useCallback(async () => {
     try {
-      // We only show the full loader on the very first load
-      const res = await axios.get(
-        "http://localhost:5000/api/jobs?category=SDE",
-      );
+      const res = await axios.get(`${API_URL}/api/jobs?category=SDE`);
       setJobs(res.data);
     } catch (err) {
-      console.error("Error fetching SDE jobs", err);
+      console.error("❌ SDE Fetch Error:", err);
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    // Initial Load
     fetchSDE();
-
-    // FIX #4: REAL-TIME REFRESH ON WINDOW FOCUS
-    // When the user switches back to this tab, it fetches the latest data instantly
     window.addEventListener("focus", fetchSDE);
-
-    // Cleanup listener on unmount
     return () => window.removeEventListener("focus", fetchSDE);
   }, [fetchSDE]);
 
@@ -57,8 +48,8 @@ const SDE = () => {
             <div className="sde-coming-soon-box">
               <h3>Deck Empty</h3>
               <p>
-                The scraper is currently searching for new Engineering roles.
-                Check back in a few minutes.
+                Check back shortly; the scraper is currently refreshing the
+                deck.
               </p>
             </div>
           )}
