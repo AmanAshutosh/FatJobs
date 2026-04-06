@@ -15,6 +15,7 @@ import SDE from "./pages/SDE";
 import DataAnalyst from "./pages/DataAnalyst";
 import Profile from "./pages/Profile";
 import "./index.css";
+import { Analytics } from "@vercel/analytics/react";
 
 const AppContent = () => {
   // FIXED: Initialize state directly from localStorage
@@ -100,6 +101,7 @@ function App() {
   return (
     <Router>
       <AppContent />
+      <Analytics />
     </Router>
   );
 }
