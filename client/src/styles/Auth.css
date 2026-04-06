@@ -1,52 +1,151 @@
-/* --- NEW TERMINAL SYSTEM ALERTS --- */
+/* Auth.css - BRIGHT MATRIX TERMINAL - FULL PRODUCTION VERSION */
 
-.spam-hint {
-  color: #fbbf24; /* Cyberpunk Amber Warning */
+.auth-terminal-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100vw;
+  background: #000;
+  position: relative;
+  overflow: hidden;
+  mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+}
+
+.auth-terminal-container::before,
+.auth-terminal-container::after {
+  content: "AS72 K892 L012 M772 P902 X221 V771 B992 Z001 SDE_ACCESS_GRANTED BINARY_LOADED FAT_JOBS_v2 ROOT_PROMPT 01010110 11001010 0XFF21 001101 SYSTEM_INIT 101010 010101 ACCESS_GRANTED 0X8822 NULL_PTR_EXCEPTION 111000 SYNC_COMPLETE AUTH_SH 101101 KEY_GEN_v2 001011 110011";
+  position: absolute;
+  top: -500px;
+  left: 0;
+  width: 150%;
+  color: rgba(34, 197, 94, 0.18); 
+  font-family: monospace;
+  font-size: 1.2rem;
+  line-height: 4; 
+  word-spacing: 200px; 
+  white-space: pre-wrap;
+  pointer-events: none;
+  z-index: 1;
+  text-shadow: 0 0 8px rgba(34, 197, 94, 0.5);
+}
+
+.auth-terminal-container::before { animation: falling-fast 6s linear infinite; }
+.auth-terminal-container::after { left: -15%; color: rgba(34, 197, 94, 0.08); animation: falling-fast 10s linear infinite; }
+
+@keyframes falling-fast {
+  0% { transform: translateY(0); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(110vh); opacity: 0; }
+}
+
+.terminal-window {
+  width: 90%;
+  max-width: 600px;
+  background: rgba(10, 10, 10, 0.98);
+  border: 1px solid #22c55e;
+  border-radius: 4px;
+  box-shadow: 0 0 30px rgba(34, 197, 94, 0.3);
+  font-family: "Courier New", Courier, monospace;
+  position: relative;
+  z-index: 10;
+}
+
+.terminal-header {
+  background: #1a1a1a;
+  color: #22c55e;
+  padding: 12px 20px;
   font-size: 0.8rem;
+  border-bottom: 1px solid #22c55e;
+  display: flex;
+  justify-content: space-between;
+}
+
+.terminal-body { padding: 40px; }
+.command-line { color: #22c55e; margin-bottom: 30px; font-size: 1rem; }
+.auth-form-group { margin-bottom: 35px; width: 100%; }
+.prompt { color: #22c55e; font-size: 0.9rem; margin-bottom: 12px; font-weight: bold; }
+
+.terminal-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border-bottom: 2px solid rgba(34, 197, 94, 0.5);
+  width: 100%;
+}
+
+.terminal-input {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-family: inherit;
+  font-size: 1.1rem;
+  width: 100%;
+  outline: none;
+  padding: 12px 0;
+}
+
+/* NEW UI ELEMENTS STYLED FOR TERMINAL */
+.spam-hint {
+  color: #fbbf24;
+  font-size: 0.75rem;
   margin: 20px 0 10px 0;
   text-align: center;
-  letter-spacing: 2px;
-  font-family: 'Courier New', monospace;
-  text-transform: uppercase;
-  /* Add a subtle glow to match your theme */
-  text-shadow: 0 0 8px rgba(251, 191, 36, 0.4);
-  opacity: 0.8;
+  letter-spacing: 1px;
+  text-shadow: 0 0 5px rgba(251, 191, 36, 0.3);
 }
 
 .resend-container {
-  margin: 15px 0;
   display: flex;
   justify-content: center;
-  min-height: 20px; /* Prevents layout jump */
+  margin-bottom: 20px;
 }
 
 .timer-text {
-  color: rgba(34, 197, 94, 0.5); /* Dimmed Matrix Green */
-  font-size: 0.85rem;
-  font-family: 'Courier New', monospace;
-  letter-spacing: 1px;
+  color: rgba(34, 197, 94, 0.5);
+  font-size: 0.8rem;
 }
 
 .resend-link {
-  color: #38bdf8; /* Cyber Blue */
-  font-size: 0.85rem;
+  color: #38bdf8;
   cursor: pointer;
-  font-family: 'Courier New', monospace;
-  text-decoration: none;
-  border-bottom: 1px dashed #38bdf8;
-  transition: all 0.2s ease;
+  font-size: 0.85rem;
+  text-decoration: underline;
 }
 
-.resend-link:hover {
-  color: #fff;
-  border-bottom: 1px solid #fff;
-  text-shadow: 0 0 10px #fff;
-}
+.resend-link:hover { color: #fff; text-shadow: 0 0 10px #fff; }
 
-/* Make the 6-digit input look consistent */
 .code-input {
   letter-spacing: 15px;
   text-align: center;
-  font-size: 1.5rem !important;
-  color: #38bdf8 !important; /* Blue for the security key */
+  font-size: 1.5rem;
+  color: #38bdf8;
 }
+
+.grant-access-btn {
+  width: 100%;
+  background: transparent;
+  color: #22c55e;
+  border: 1px solid #22c55e;
+  padding: 20px;
+  font-family: inherit;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  cursor: pointer;
+}
+
+.grant-access-btn:hover { background: #22c55e; color: #000; box-shadow: 0 0 20px #22c55e; }
+
+.error-text {
+  color: #ff4444;
+  text-align: center;
+  margin-top: 20px;
+  font-size: 0.8rem;
+  border: 1px dashed #ff4444;
+  padding: 10px;
+}
+
+.toggle-text { color: #22c55e; cursor: pointer; font-size: 0.85rem; opacity: 0.6; display: block; text-align: center; margin-top: 20px;}
