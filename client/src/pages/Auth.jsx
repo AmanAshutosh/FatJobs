@@ -11,23 +11,34 @@ const Auth = ({ setUser, onNavigate }) => {
   const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
-  // 🕒 Timer State
+  
+  // Blinker Position States
+  const [emailWidth, setEmailWidth] = useState(0);
+  const [nameWidth, setNameWidth] = useState(0);
   const [timer, setTimer] = useState(0);
 
-  // Countdown logic for the Resend button
   useEffect(() => {
     let interval;
     if (timer > 0) {
-      interval = setInterval(() => {
-        setTimer((prev) => prev - 1);
-      }, 1000);
+      interval = setInterval(() => setTimer((prev) => prev - 1), 1000);
     }
     return () => clearInterval(interval);
   }, [timer]);
 
-  const handleInputChange = (e, field) => {
-    setFormData({ ...formData, [field]: e.target.value });
+  // Measures text width to move the blinker
+  const handleInputChange = (e, field, setWidth) => {
+    const value = e.target.value;
+    setFormData({ ...formData, [field]: value });
+
+    const span = document.createElement("span");
+    span.style.font = "1.1rem 'Courier New', monospace";
+    span.style.visibility = "hidden";
+    span.style.position = "absolute";
+    span.style.whiteSpace = "pre";
+    span.innerText = value;
+    document.body.appendChild(span);
+    setWidth(span.offsetWidth);
+    document.body.removeChild(span);
   };
 
   const handleRequest = async (e) => {
@@ -41,15 +52,11 @@ const Auth = ({ setUser, onNavigate }) => {
         isSignup,
       });
       setStep(2);
-      setTimer(60); // Start 60s countdown
-      setOtp("");
+      setTimer(60);
+      setOtp(""); 
     } catch (err) {
-      const serverMessage = err.response?.data?.message;
-      if (serverMessage === "LIMIT_EXCEEDED: MAXIMUM_5_KEYS_PER_24H") {
-        setError("SECURITY_LOCK: MAX_ATTEMPTS_REACHED_FOR_24H");
-      } else {
-        setError(serverMessage || "SYSTEM_OFFLINE");
-      }
+      const msg = err.response?.data?.message || "SYSTEM_OFFLINE";
+      setError(msg === "LIMIT_EXCEEDED: MAXIMUM_5_KEYS_PER_24H" ? "SECURITY_LOCK: MAX_ATTEMPTS_REACHED" : msg);
     } finally {
       setLoading(false);
     }
@@ -69,7 +76,7 @@ const Auth = ({ setUser, onNavigate }) => {
         onNavigate("/sde");
       }
     } catch (err) {
-      setError("ACCESS_DENIED: INVALID_ENCRYPTION_KEY");
+      setError("ACCESS_DENIED: INVALID_KEY");
     } finally {
       setLoading(false);
     }
@@ -83,68 +90,87 @@ const Auth = ({ setUser, onNavigate }) => {
           <span>● ● ●</span>
         </div>
         <div className="terminal-body">
+          <p className="command-line"> {isSignup ? "INITIALIZING_SIGNUP..." : "EXECUTING_AUTH_v2..."}</p>
+
           {step === 1 ? (
             <form onSubmit={handleRequest} className="terminal-form">
               {isSignup && (
                 <div className="auth-form-group">
                   <p className="prompt">FULL_NAME:</p>
-                  <input
-                    className="terminal-input"
-                    required
-                    onChange={(e) => handleInputChange(e, "name")}
-                  />
+                  <div className="terminal-input-wrapper">
+                    <input 
+                      className="terminal-input" 
+                      required 
+                      autoComplete="off"
+                      onChange={(e) => handleInputChange(e, "name", setNameWidth)} 
+                    />
+                    <span 
+                      className="custom-blinker" 
+                      style={{ transform: `translateX(${nameWidth}px)` }}
+                    ></span>
+                  </div>
                 </div>
               )}
               <div className="auth-form-group">
                 <p className="prompt">EMAIL_ADDRESS:</p>
-                <input
-                  className="terminal-input"
-                  type="email"
-                  required
-                  onChange={(e) => handleInputChange(e, "email")}
-                />
+                <div className="terminal-input-wrapper">
+                  <input 
+                    className="terminal-input" 
+                    type="email" 
+                    required 
+                    autoComplete="off"
+                    onChange={(e) => handleInputChange(e, "email", setEmailWidth)} 
+                  />
+                  <span 
+                    className="custom-blinker" 
+                    style={{ transform: `translateX(${emailWidth}px)` }}
+                  ></span>
+                </div>
               </div>
-              <button
-                type="submit"
-                className="grant-access-btn"
-                disabled={loading}
-              >
+              <button type="submit" className="grant-access-btn" disabled={loading}>
                 {loading ? "TRANSMITTING..." : "[ GENERATE_ACCESS_KEY ]"}
               </button>
+              
+              <div className="terminal-footer">
+                <span className="toggle-text" onClick={() => { 
+                  setIsSignup(!isSignup); 
+                  setStep(1); 
+                  setError(""); 
+                  setEmailWidth(0); 
+                  setNameWidth(0); 
+                }}>
+                  {isSignup ? "> ALREADY_HAVE_ACCESS? _LOGIN" : "> NEW_USER? _CREATE_ACCOUNT"}
+                </span>
+              </div>
             </form>
           ) : (
             <form onSubmit={handleVerify} className="terminal-form">
               <p className="prompt">ENTER_6_DIGIT_KEY:</p>
-              <input
-                className="terminal-input code-input"
-                maxLength="6"
-                value={otp}
-                onChange={(e) => setOtp(e.target.value)}
-                autoFocus
-              />
-
+              <div className="terminal-input-wrapper">
+                <input 
+                  className="terminal-input code-input" 
+                  maxLength="6" 
+                  value={otp} 
+                  onChange={(e) => setOtp(e.target.value)} 
+                  autoFocus 
+                />
+              </div>
+              
               <p className="spam-hint">!! CHECK_INBOX_OR_SPAM_FOLDER !!</p>
 
               <div className="resend-container">
                 {timer > 0 ? (
                   <p className="timer-text">RESEND_AVAILABLE_IN: {timer}s</p>
                 ) : (
-                  <span className="resend-link" onClick={handleRequest}>
-                    {"> RE-GENERATE_ACCESS_KEY"}
-                  </span>
+                  <span className="resend-link" onClick={handleRequest}>{"> RE-GENERATE_ACCESS_KEY"}</span>
                 )}
               </div>
 
-              <button
-                type="submit"
-                className="grant-access-btn"
-                style={{ marginTop: "20px" }}
-              >
+              <button type="submit" className="grant-access-btn" style={{marginTop: '20px'}}>
                 {loading ? "VERIFYING..." : "[ AUTHORIZE_ACCESS ]"}
               </button>
             </form>
           )}
-
           {error && <p className="error-text">!! {error} !!</p>}
         </div>
       </div>
