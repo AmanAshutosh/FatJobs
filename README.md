@@ -51,9 +51,12 @@ Every job is rendered as a premium card with dynamic visual feedback:
 ---
 
 📈 Roadmap
-[ ] AI Resume Matcher: Upload resume to see a match percentage for each card.
+[ ] AI Resume Matcher: Upload a resume to see a match percentage for each card.
+
 [ ] Email Alerts: Opt-in for "Green Glow" (0-24h) role notifications.
+
 [ ] One-Click Apply: Integration with common ATS forms to fill details automatically.
 
 Developed with ⚡ by Ashutosh Aman
+
 Full-Stack Developer | Noida, India
