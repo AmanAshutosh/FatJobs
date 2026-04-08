@@ -6,6 +6,7 @@ const nodeCron = require("node-cron");
 const {
   scrapeGreenhouse,
   scrapeJSearch,
+  scrapeJobs, // <--- ADD THIS: This is the master function that includes sheet scraping
 } = require("./services/scraperService");
 const jobRoutes = require("./routes/jobRoutes");
 const authRoutes = require("./routes/authRoutes");
@@ -17,7 +18,7 @@ app.use(cors({ origin: "*", methods: ["GET", "POST"] }));
 app.use(express.json());
 
 app.get("/", (req, res) =>
-  res.status(200).send("🚀 FatJobs Backend is Running!"),
+  res.status(200).send("FatJobs Backend is Running!"),
 );
 
 app.use("/api/auth", authRoutes);
@@ -28,19 +29,21 @@ mongoose
   .then(() => {
     console.log("✅ Cloud Database Linked!");
 
-    // TASK 1: EVERY 2 HOURS (FREE - The "Green Card" Generator)
+    // --- TASK 1: EVERY 2 HOURS (The "Sheet & Company Board" Sync) ---
     nodeCron.schedule("0 */2 * * *", async () => {
-      console.log("⏰ 2-Hour Sync: Direct Company Boards...");
+      console.log(" 2-Hour Sync: Sheet Links & Greenhouse Boards...");
       try {
-        await scrapeGreenhouse();
+        // We call scrapeJobs() now because it contains both
+        // the Sheet logic AND the Greenhouse logic.
+        await scrapeJobs();
       } catch (err) {
-        console.log("Greenhouse sync error:", err.message);
+        console.log("Master sync error:", err.message);
       }
     });
 
-    // TASK 2: ONCE A DAY (PAID/LIMITED - The LinkedIn Aggregator)
+    // --- TASK 2: ONCE A DAY (The LinkedIn/JSearch Aggregator) ---
     nodeCron.schedule("0 0 * * *", async () => {
-      console.log("⏰ Midnight Sync: JSearch Aggregator...");
+      console.log(" Midnight Sync: JSearch Aggregator...");
       try {
         await scrapeJSearch();
       } catch (err) {
