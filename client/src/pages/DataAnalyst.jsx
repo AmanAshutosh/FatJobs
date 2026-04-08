@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
-import axios from "axios";
+// 1. Import the fetchJobs helper directly from your api.js
+import { fetchJobs } from "../api";
 import JobCard from "../components/JobCard";
-import API_URL from "../api";
 import "../styles/DataAnalyst.css";
 
 const DataAnalyst = () => {
@@ -11,18 +11,15 @@ const DataAnalyst = () => {
   const fetchDAJobs = useCallback(async () => {
     try {
       setLoading(true);
-      // Logic: Ensure we don't have double /api/api
-      const cleanBase = API_URL.endsWith("/api")
-        ? API_URL.replace("/api", "")
-        : API_URL;
-      const response = await axios.get(`${cleanBase}/api/jobs?category=DA`);
 
-      console.log("📡 DA Deck Sync:", response.data);
+      // 2. Use the helper function with the "DA" category
+      // It handles the baseURL and "/api/jobs" automatically
+      const res = await fetchJobs({ category: "DA" });
 
-      // Handle both raw arrays and nested object responses
-      const jobData = Array.isArray(response.data)
-        ? response.data
-        : response.data.jobs || [];
+      console.log("📡 DA Deck Sync Data:", res.data);
+
+      // 3. Robust data check to prevent "Deck Empty" on weird API responses
+      const jobData = Array.isArray(res.data) ? res.data : res.data.jobs || [];
       setJobs(jobData);
     } catch (error) {
       console.error("❌ DA Fetch Error:", error);
@@ -34,6 +31,7 @@ const DataAnalyst = () => {
 
   useEffect(() => {
     fetchDAJobs();
+    // Refresh when user comes back to the tab
     window.addEventListener("focus", fetchDAJobs);
     return () => window.removeEventListener("focus", fetchDAJobs);
   }, [fetchDAJobs]);

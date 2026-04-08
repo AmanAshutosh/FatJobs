@@ -1,25 +1,23 @@
 import React, { useEffect, useState, useCallback } from "react";
-import axios from "axios";
+// 1. Import the fetchJobs helper directly from your api.js
+import { fetchJobs } from "../api";
 import JobCard from "../components/JobCard";
-import API_URL from "../api";
 import "../styles/SDE.css";
 
 const SDE = () => {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchSDE = useCallback(async () => {
+  const fetchSDEDeck = useCallback(async () => {
     try {
       setLoading(true);
-      // Logic: Ensure we don't have double /api/api
-      const cleanBase = API_URL.endsWith("/api")
-        ? API_URL.replace("/api", "")
-        : API_URL;
-      const res = await axios.get(`${cleanBase}/api/jobs?category=SDE`);
 
-      console.log("📡 SDE Deck Sync:", res.data);
+      // 2. Use the helper function. It already handles the baseURL and "/api/jobs"
+      const res = await fetchJobs({ category: "SDE" });
 
-      // Handle both raw arrays and nested object responses
+      console.log("📡 SDE Deck Sync Data:", res.data);
+
+      // 3. Robust data check
       const jobData = Array.isArray(res.data) ? res.data : res.data.jobs || [];
       setJobs(jobData);
     } catch (err) {
@@ -31,10 +29,10 @@ const SDE = () => {
   }, []);
 
   useEffect(() => {
-    fetchSDE();
-    window.addEventListener("focus", fetchSDE);
-    return () => window.removeEventListener("focus", fetchSDE);
-  }, [fetchSDE]);
+    fetchSDEDeck();
+    window.addEventListener("focus", fetchSDEDeck);
+    return () => window.removeEventListener("focus", fetchSDEDeck);
+  }, [fetchSDEDeck]);
 
   return (
     <div className="sde-container">
@@ -54,7 +52,7 @@ const SDE = () => {
         <div className="job-grid">
           {loading ? (
             <div className="loading-state">
-              <h3>🚀 Syncing SDE Deck...</h3>
+              <h3>Syncing SDE Deck...</h3>
             </div>
           ) : jobs.length > 0 ? (
             jobs.map((job) => <JobCard key={job._id || job.link} job={job} />)
