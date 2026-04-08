@@ -7,15 +7,16 @@ exports.getJobs = async (req, res) => {
       q,
       workType,
       experience,
-      hours = 72,
       limit = 100,
-    } = req.query;
+      } = req.query;
+      
+      const hours = parseInt(req.query.hours) || 168;
 
     // 1. DYNAMIC FRESHNESS (The Early Applicant Shield)
     const cutoff = new Date(Date.now() - parseInt(hours) * 60 * 60 * 1000);
 
     let query = {
-      postedAt: { $gte: cutoff },
+      postedAt: { $gte: dateLimit },
     };
 
     // 2. CATEGORY & WORK MODE

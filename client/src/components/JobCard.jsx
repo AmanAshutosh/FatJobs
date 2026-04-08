@@ -13,19 +13,29 @@ const JobCard = ({ job }) => {
 
     let sClass = "status-pulse";
     let label = "ACTIVE";
+    let glowClass = "";
+    let themeColor = "#888888"; // Default Gray
 
     if (diffInHours <= 24) {
       sClass += " hot";
       label = "NEW";
-    } else if (diffInHours <= 48) {
+      glowClass = "glow-green";
+      themeColor = "#22c55e"; // Success Green
+    } else if (diffInHours <= 72) {
       sClass += " warm";
       label = "RECENT";
-    } else if (diffInHours <= 72) {
-      sClass += " urgent";
-      label = "URGENT";
+      glowClass = "glow-orange";
+      themeColor = "#f97316"; // Warning Orange
+    } else if (diffInHours <= 168) {
+      sClass += " stable";
+      label = "STABLE";
+      glowClass = "glow-gray";
+      themeColor = "#64748b"; // Slate Gray
     } else {
       sClass += " cold";
       label = "ARCHIVED";
+      glowClass = "glow-dim";
+      themeColor = "#94a3b8";
     }
 
     const timeLabel = isValidDate
@@ -38,14 +48,17 @@ const JobCard = ({ job }) => {
         })
       : "Recently Synced";
 
-    return { sClass, timeLabel, label };
+    return { sClass, timeLabel, label, glowClass, themeColor };
   }, [job.postedAt, job.createdAt]);
 
   if (!job || !job.title) return null;
 
   return (
-    <div className="trump-card-wrapper">
-      <div className="trump-card">
+    <div className={`trump-card-wrapper ${jobStats.glowClass}`}>
+      <div
+        className="trump-card"
+        style={{ "--card-glow-color": jobStats.themeColor }}
+      >
         {/* HEADER */}
         <div className="card-header">
           <div className="card-name-role">
@@ -61,18 +74,24 @@ const JobCard = ({ job }) => {
             <div
               className={jobStats.sClass}
               title={`Status: ${jobStats.label}`}
+              style={{ backgroundColor: jobStats.themeColor }}
             ></div>
           </div>
         </div>
 
         {/* VISUAL SECTION */}
         <div className="card-image-section">
-          <div className="image-circle">
+          <div
+            className="image-circle"
+            style={{ borderColor: jobStats.themeColor }}
+          >
             <span className="title-preview">
               {job.company?.charAt(0) || "J"}
             </span>
           </div>
-          <div className="rating-stars">★★★★★</div>
+          <div className="rating-stars" style={{ color: jobStats.themeColor }}>
+            ★★★★★
+          </div>
         </div>
 
         {/* STATS SECTION */}
@@ -112,6 +131,11 @@ const JobCard = ({ job }) => {
             target="_blank"
             rel="noopener noreferrer"
             className="apply-file-button"
+            style={{
+              // Transparent glow on background, solid on border
+              backgroundColor: jobStats.themeColor + "15",
+              borderColor: jobStats.themeColor,
+            }}
           >
             <i className="ri-file-list-3-line"></i> VIEW APPLY FILE
           </a>

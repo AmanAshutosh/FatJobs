@@ -1,4 +1,4 @@
-/* JobCard.css - Final Production Version */
+/* JobCard.css - Glowing Neon Edition */
 
 .trump-card-wrapper {
   perspective: 1000px;
@@ -10,26 +10,33 @@
 .trump-card {
   width: 100%;
   max-width: 340px;
-  background-color: #fefdf5; 
-  border: 10px solid #166534; 
+  background-color: #fefdf5; /* Original light cream background */
+  
+  /* THIN & GLOWING BORDER */
+  /* Uses the variable passed from JobCard.jsx style prop */
+  border: 1.5px solid var(--card-glow-color, #166534); 
+  box-shadow: 0 4px 15px var(--card-glow-color, rgba(22, 101, 52, 0.2));
+  
   border-radius: 16px;
   padding: 12px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
   display: flex;
   flex-direction: column;
-  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   position: relative;
   overflow: hidden;
   box-sizing: border-box;
 }
 
+/* Hover State: Intensify the Glow and Lift */
 .trump-card:hover {
-  transform: translateY(-10px) rotateX(2deg);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  transform: translateY(-10px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2), 0 0 20px var(--card-glow-color);
+  border-width: 2px;
 }
 
 .card-header {
-  border: 2px solid #1e293b;
+  /* Thin border to match the new aesthetic */
+  border: 1px solid #1e293b;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -49,14 +56,14 @@
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 220px;
-  /* Icon Alignment */
   display: flex;
   align-items: center;
   gap: 6px;
 }
 
+/* Icon matching the current theme color */
 .card-name-role h2 i {
-  color: #166534;
+  color: var(--card-glow-color);
   font-size: 1.1rem;
 }
 
@@ -65,41 +72,28 @@
   font-weight: 700;
   color: #64748b;
   margin-top: 2px;
-  /* Icon Alignment */
   display: flex;
   align-items: center;
   gap: 4px;
 }
 
-/* PULSE LIGHTS */
+/* PULSE LIGHTS - Positioned in the header */
 .status-pulse {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
   border: 1px solid rgba(0,0,0,0.1);
+  /* The pulse color will be set by the theme color */
 }
 
-.status-pulse.hot { background-color: #22c55e; animation: pulse-green 2s infinite; }
-.status-pulse.warm { background-color: #f97316; animation: pulse-orange 2s infinite; }
-.status-pulse.urgent { background-color: #ef4444; animation: pulse-red 2s infinite; }
-.status-pulse.cold { background-color: #94a3b8; }
+.status-pulse.hot { animation: pulse-dynamic 2s infinite; }
+.status-pulse.warm { animation: pulse-dynamic 2s infinite; opacity: 0.8; }
+.status-pulse.urgent { animation: pulse-dynamic 2s infinite; }
 
-@keyframes pulse-green {
-  0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
-  70% { box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
-}
-
-@keyframes pulse-orange {
-  0% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.7); }
-  70% { box-shadow: 0 0 0 8px rgba(249, 115, 22, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0); }
-}
-
-@keyframes pulse-red {
-  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
-  70% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+@keyframes pulse-dynamic {
+  0% { box-shadow: 0 0 0 0 var(--card-glow-color); }
+  70% { box-shadow: 0 0 0 8px rgba(0, 0, 0, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(0, 0, 0, 0); }
 }
 
 /* IMAGE SECTION */
@@ -108,26 +102,27 @@
   flex-direction: column;
   align-items: center;
   margin-bottom: 12px;
-  background: linear-gradient(180deg, #f1f5f9 0%, #cbd5e1 100%);
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
   border-radius: 10px;
   padding: 15px 10px;
 }
 
 .image-circle {
-  width: 110px;
-  height: 110px;
+  width: 100px;
+  height: 100px;
   background-color: #fff;
   border-radius: 50%;
-  border: 4px solid #166534;
+  /* Thin glowing border for the circle */
+  border: 2px solid var(--card-glow-color);
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 8px;
-  box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.05), 0 0 10px var(--card-glow-color);
 }
 
 .image-circle span {
-  font-size: 2.5rem;
+  font-size: 2.2rem;
   font-weight: 800;
   color: #1a1a1a;
   text-transform: uppercase;
@@ -135,15 +130,15 @@
 
 .rating-stars {
   margin-top: -12px;
-  color: #1a1a1a;
-  font-size: 1.2rem;
+  color: var(--card-glow-color);
+  font-size: 1.1rem;
   background-color: #fefdf5;
   padding: 0 12px;
   border-radius: 12px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid rgba(0,0,0,0.05);
 }
 
-/* STATS */
+/* STATS SECTION */
 .card-stats {
   display: flex;
   flex-direction: column;
@@ -153,7 +148,7 @@
 .stat-row {
   display: flex;
   justify-content: space-between;
-  align-items: center; /* Ensures key and value line up */
+  align-items: center;
   border-bottom: 1px solid #e2e8f0;
   padding: 6px 2px;
 }
@@ -163,7 +158,6 @@
   font-weight: 800;
   color: #475569;
   text-transform: uppercase;
-  /* Icon Alignment */
   display: flex;
   align-items: center;
   gap: 5px;
@@ -171,7 +165,7 @@
 
 .stat-key i {
   font-size: 11px;
-  color: #166534; /* Green accent for icons */
+  color: var(--card-glow-color);
 }
 
 .stat-value {
@@ -191,6 +185,7 @@
   padding: 10px;
   background-color: #1a1a1a;
   color: #ffffff;
+  border: 1px solid var(--card-glow-color);
   text-transform: uppercase;
   font-size: 10px;
   font-weight: 900;
@@ -202,9 +197,6 @@
 
 .apply-file-button:hover {
   background-color: #000;
-  letter-spacing: 1px;
-}
-
-.apply-file-button i {
-  font-size: 12px;
+  box-shadow: 0 0 12px var(--card-glow-color);
+  letter-spacing: 0.5px;
 }
