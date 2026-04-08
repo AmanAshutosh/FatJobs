@@ -1,4 +1,4 @@
-/* JobCard.css - Glowing Neon Edition */
+/* JobCard.css - Final Glowing Production Version */
 
 .trump-card-wrapper {
   perspective: 1000px;
@@ -10,15 +10,12 @@
 .trump-card {
   width: 100%;
   max-width: 340px;
-  background-color: #fefdf5; /* Original light cream background */
-  
-  /* THIN & GLOWING BORDER */
-  /* Uses the variable passed from JobCard.jsx style prop */
-  border: 1.5px solid var(--card-glow-color, #166534); 
-  box-shadow: 0 4px 15px var(--card-glow-color, rgba(22, 101, 52, 0.2));
-  
+  min-height: 500px; /* Forces uniform card size */
+  background-color: #fefdf5;
+  border: 1.5px solid var(--card-glow-color, #166534);
+  box-shadow: 0 4px 15px var(--card-glow-color, rgba(22, 101, 52, 0.1));
   border-radius: 16px;
-  padding: 12px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -27,68 +24,55 @@
   box-sizing: border-box;
 }
 
-/* Hover State: Intensify the Glow and Lift */
 .trump-card:hover {
   transform: translateY(-10px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2), 0 0 20px var(--card-glow-color);
-  border-width: 2px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2), 0 0 20px var(--card-glow-color);
 }
 
 .card-header {
-  /* Thin border to match the new aesthetic */
   border: 1px solid #1e293b;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 6px 10px;
-  margin-bottom: 10px;
+  padding: 8px 12px;
+  margin-bottom: 12px;
   background-color: #ffffff;
 }
 
 .card-name-role h2 {
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 900;
   text-transform: uppercase;
   color: #0f172a;
   margin: 0;
-  line-height: 1.1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 220px;
   display: flex;
   align-items: center;
   gap: 6px;
-}
-
-/* Icon matching the current theme color */
-.card-name-role h2 i {
-  color: var(--card-glow-color);
-  font-size: 1.1rem;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .card-platform-tag {
   font-size: 10px;
   font-weight: 700;
   color: #64748b;
-  margin-top: 2px;
   display: flex;
   align-items: center;
   gap: 4px;
 }
 
-/* PULSE LIGHTS - Positioned in the header */
+/* PULSE LIGHTS */
 .status-pulse {
-  width: 14px;
-  height: 14px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   border: 1px solid rgba(0,0,0,0.1);
-  /* The pulse color will be set by the theme color */
 }
 
 .status-pulse.hot { animation: pulse-dynamic 2s infinite; }
-.status-pulse.warm { animation: pulse-dynamic 2s infinite; opacity: 0.8; }
-.status-pulse.urgent { animation: pulse-dynamic 2s infinite; }
+.status-pulse.warm { animation: pulse-dynamic 2s infinite; opacity: 0.9; }
 
 @keyframes pulse-dynamic {
   0% { box-shadow: 0 0 0 0 var(--card-glow-color); }
@@ -101,71 +85,60 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 12px;
-  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
-  border-radius: 10px;
-  padding: 15px 10px;
+  margin-bottom: 15px;
+  background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
+  border-radius: 12px;
+  padding: 20px 10px;
 }
 
 .image-circle {
-  width: 100px;
-  height: 100px;
+  width: 90px;
+  height: 90px;
   background-color: #fff;
   border-radius: 50%;
-  /* Thin glowing border for the circle */
   border: 2px solid var(--card-glow-color);
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 8px;
-  box-shadow: inset 0 2px 4px rgba(0,0,0,0.05), 0 0 10px var(--card-glow-color);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
 }
 
 .image-circle span {
-  font-size: 2.2rem;
-  font-weight: 800;
-  color: #1a1a1a;
-  text-transform: uppercase;
+  font-size: 2rem;
+  font-weight: 900;
+  color: #1e293b;
 }
 
 .rating-stars {
-  margin-top: -12px;
-  color: var(--card-glow-color);
-  font-size: 1.1rem;
+  margin-top: -10px;
+  font-size: 1rem;
   background-color: #fefdf5;
-  padding: 0 12px;
-  border-radius: 12px;
+  padding: 2px 12px;
+  border-radius: 20px;
   border: 1px solid rgba(0,0,0,0.05);
 }
 
-/* STATS SECTION */
+/* STATS */
 .card-stats {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
 
 .stat-row {
   display: flex;
   justify-content: space-between;
-  align-items: center;
   border-bottom: 1px solid #e2e8f0;
-  padding: 6px 2px;
+  padding: 6px 0;
 }
 
 .stat-key {
   font-size: 9px;
   font-weight: 800;
-  color: #475569;
-  text-transform: uppercase;
+  color: #64748b;
   display: flex;
   align-items: center;
   gap: 5px;
-}
-
-.stat-key i {
-  font-size: 11px;
-  color: var(--card-glow-color);
 }
 
 .stat-value {
@@ -174,29 +147,33 @@
   color: #0f172a;
 }
 
-/* FOOTER BUTTON */
+/* FOOTER - THE CRITICAL PART */
+.card-footer {
+  margin-top: auto;
+  padding-top: 15px;
+  width: 100%;
+}
+
 .apply-file-button {
-  display: flex;
+  display: flex !important;
   align-items: center;
   justify-content: center;
   gap: 8px;
   width: 100%;
-  margin-top: 10px;
-  padding: 10px;
-  background-color: #1a1a1a;
-  color: #ffffff;
-  border: 1px solid var(--card-glow-color);
-  text-transform: uppercase;
-  font-size: 10px;
-  font-weight: 900;
-  text-align: center;
+  padding: 14px;
+  background-color: var(--card-glow-color) !important;
+  color: #ffffff !important;
   text-decoration: none;
-  border-radius: 4px;
-  transition: all 0.2s ease;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
 .apply-file-button:hover {
-  background-color: #000;
-  box-shadow: 0 0 12px var(--card-glow-color);
-  letter-spacing: 0.5px;
+  filter: brightness(1.1);
+  transform: scale(1.02);
+  box-shadow: 0 0 15px var(--card-glow-color);
 }

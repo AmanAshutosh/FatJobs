@@ -14,28 +14,28 @@ const JobCard = ({ job }) => {
     let sClass = "status-pulse";
     let label = "ACTIVE";
     let glowClass = "";
-    let themeColor = "#888888"; // Default Gray
+    let themeColor = "#64748b"; // Default Slate
 
     if (diffInHours <= 24) {
       sClass += " hot";
       label = "NEW";
       glowClass = "glow-green";
-      themeColor = "#22c55e"; // Success Green
+      themeColor = "#22c55e"; // Emerald
     } else if (diffInHours <= 72) {
       sClass += " warm";
       label = "RECENT";
       glowClass = "glow-orange";
-      themeColor = "#f97316"; // Warning Orange
+      themeColor = "#f97316"; // Orange
     } else if (diffInHours <= 168) {
       sClass += " stable";
       label = "STABLE";
       glowClass = "glow-gray";
-      themeColor = "#64748b"; // Slate Gray
+      themeColor = "#475569"; // Slate
     } else {
       sClass += " cold";
       label = "ARCHIVED";
       glowClass = "glow-dim";
-      themeColor = "#94a3b8";
+      themeColor = "#94a3b8"; // Light Slate
     }
 
     const timeLabel = isValidDate
@@ -73,7 +73,6 @@ const JobCard = ({ job }) => {
           <div className="card-flag">
             <div
               className={jobStats.sClass}
-              title={`Status: ${jobStats.label}`}
               style={{ backgroundColor: jobStats.themeColor }}
             ></div>
           </div>
@@ -85,9 +84,7 @@ const JobCard = ({ job }) => {
             className="image-circle"
             style={{ borderColor: jobStats.themeColor }}
           >
-            <span className="title-preview">
-              {job.company?.charAt(0) || "J"}
-            </span>
+            <span>{job.company?.charAt(0) || "J"}</span>
           </div>
           <div className="rating-stars" style={{ color: jobStats.themeColor }}>
             ★★★★★
@@ -118,24 +115,19 @@ const JobCard = ({ job }) => {
           </div>
           <div className="stat-row">
             <span className="stat-key">
-              <i className="ri-calendar-event-line"></i> POSTED AT
+              <i className="ri-calendar-event-line"></i> POSTED
             </span>
             <span className="stat-value">{jobStats.timeLabel}</span>
           </div>
         </div>
 
-        {/* FOOTER */}
+        {/* FOOTER - THE FIX */}
         <div className="card-footer">
           <a
             href={job.link}
             target="_blank"
             rel="noopener noreferrer"
             className="apply-file-button"
-            style={{
-              // Transparent glow on background, solid on border
-              backgroundColor: jobStats.themeColor + "15",
-              borderColor: jobStats.themeColor,
-            }}
           >
             <i className="ri-file-list-3-line"></i> VIEW APPLY FILE
           </a>
