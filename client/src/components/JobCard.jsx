@@ -121,7 +121,7 @@ const JobCard = ({ job }) => {
           </div>
         </div>
 
-        {/* FOOTER - THE FIX */}
+        {/* FOOTER */}
         <div className="card-footer">
           <a
             href={job.link}
@@ -129,7 +129,8 @@ const JobCard = ({ job }) => {
             rel="noopener noreferrer"
             className="apply-file-button"
           >
-            <i className="ri-file-list-3-line"></i> VIEW APPLY FILE
+            <i className="ri-file-list-3-line"></i>
+            VIEW APPLY FILE
           </a>
         </div>
       </div>
