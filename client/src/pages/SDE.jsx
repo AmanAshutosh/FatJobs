@@ -10,17 +10,21 @@ const SDE = () => {
 
   const fetchSDE = useCallback(async () => {
     try {
-      // Fetching from the live Railway API
-      const res = await axios.get(`${API_URL}/api/jobs?category=SDE`);
+      setLoading(true);
+      // Logic: Ensure we don't have double /api/api
+      const cleanBase = API_URL.endsWith("/api")
+        ? API_URL.replace("/api", "")
+        : API_URL;
+      const res = await axios.get(`${cleanBase}/api/jobs?category=SDE`);
 
-      // Safety check: Ensure we are setting an array
-      if (Array.isArray(res.data)) {
-        setJobs(res.data);
-      } else {
-        setJobs([]);
-      }
+      console.log("📡 SDE Deck Sync:", res.data);
+
+      // Handle both raw arrays and nested object responses
+      const jobData = Array.isArray(res.data) ? res.data : res.data.jobs || [];
+      setJobs(jobData);
     } catch (err) {
       console.error("❌ SDE Fetch Error:", err);
+      setJobs([]);
     } finally {
       setLoading(false);
     }
@@ -28,7 +32,6 @@ const SDE = () => {
 
   useEffect(() => {
     fetchSDE();
-    // Re-sync when user returns to tab
     window.addEventListener("focus", fetchSDE);
     return () => window.removeEventListener("focus", fetchSDE);
   }, [fetchSDE]);

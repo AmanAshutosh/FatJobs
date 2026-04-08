@@ -10,16 +10,23 @@ const DataAnalyst = () => {
 
   const fetchDAJobs = useCallback(async () => {
     try {
-      // Requesting only DA category from Railway
-      const response = await axios.get(`${API_URL}/api/jobs?category=DA`);
+      setLoading(true);
+      // Logic: Ensure we don't have double /api/api
+      const cleanBase = API_URL.endsWith("/api")
+        ? API_URL.replace("/api", "")
+        : API_URL;
+      const response = await axios.get(`${cleanBase}/api/jobs?category=DA`);
 
-      if (Array.isArray(response.data)) {
-        setJobs(response.data);
-      } else {
-        setJobs([]);
-      }
+      console.log("📡 DA Deck Sync:", response.data);
+
+      // Handle both raw arrays and nested object responses
+      const jobData = Array.isArray(response.data)
+        ? response.data
+        : response.data.jobs || [];
+      setJobs(jobData);
     } catch (error) {
       console.error("❌ DA Fetch Error:", error);
+      setJobs([]);
     } finally {
       setLoading(false);
     }
@@ -27,7 +34,6 @@ const DataAnalyst = () => {
 
   useEffect(() => {
     fetchDAJobs();
-    // Re-sync when user returns to tab
     window.addEventListener("focus", fetchDAJobs);
     return () => window.removeEventListener("focus", fetchDAJobs);
   }, [fetchDAJobs]);
