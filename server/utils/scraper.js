@@ -3,10 +3,32 @@ const dayjs = require("dayjs");
 const cheerio = require("cheerio");
 const Job = require("../models/Job");
 
-// ─── HELPERS ────────────────────────────────────────────────────────────────
-const isRecent = (date) => date && dayjs().diff(dayjs(date), "hour") <= 24;
+// ─── CONFIGURATION: THE ECOSYSTEM LISTS ────────────────────────────────────
+const TARGETS = {
+  greenhouse: [
+    { name: "Binance", slug: "binance" },
+    { name: "Razorpay", slug: "razorpay" },
+    { name: "Zepto", slug: "zepto" },
+    { name: "Zomato", slug: "zomato" },
+    { name: "Blinkit", slug: "blinkit" },
+    { name: "Swiggy", slug: "swiggy" },
+    { name: "Groww", slug: "groww" },
+    { name: "PhonePe", slug: "phonepe" },
+    { name: "Vercel", slug: "vercel" },
+    { name: "Notion", slug: "notion" },
+    { name: "Figma", slug: "figma" },
+    { name: "Polygon", slug: "polygon" },
+  ],
+  lever: [
+    { name: "Postman", slug: "postman" },
+    { name: "BrowserStack", slug: "browserstack" },
+    { name: "CRED", slug: "cred" },
+    { name: "Chargebee", slug: "chargebee" },
+    { name: "Innovaccer", slug: "innovaccer" },
+  ],
+};
 
-// THE BOUNCER: This separates the decks
+// ─── HELPERS: DATA SANITIZATION ───────────────────────────────────────────
 const getStrictCategory = (title) => {
   const name = title.toLowerCase();
   const daKeywords = [
@@ -15,52 +37,19 @@ const getStrictCategory = (title) => {
     "bi",
     "intelligence",
     "tableau",
-    "insights",
     "analytics",
     "sql",
   ];
-
-  if (daKeywords.some((kw) => name.includes(kw))) {
-    return "DA";
-  }
-  return "SDE";
+  return daKeywords.some((kw) => name.includes(kw)) ? "DA" : "SDE";
 };
 
-// ─── SOURCE: LINKEDIN ───────────────────────────────────────────────────────
-const fetchLinkedIn = async (searchKeyword) => {
-  try {
-    const url = `https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search?keywords=${encodeURIComponent(searchKeyword)}&location=India`;
-    const { data } = await axios.get(url, {
-      headers: {
-        "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/119.0.0.0",
-      },
-    });
-    const $ = cheerio.load(data);
-    const jobs = [];
-
-    $(".job-search-card").each((i, el) => {
-      const title = $(el).find(".base-search-card__title").text().trim();
-      const link = $(el)
-        .find(".base-card__full-link")
-        .attr("href")
-        ?.split("?")[0];
-      if (title && link) {
-        jobs.push({
-          title,
-          company: $(el).find(".base-search-card__subtitle").text().trim(),
-          link,
-          platform: "LinkedIn",
-          category: getStrictCategory(title),
-          createdAt: new Date(),
-        });
-      }
-    });
-    return jobs;
-  } catch (err) {
-    return [];
-  }
-};
+// ─── STEALTH HEADERS (To avoid Blacklisting) ──────────────────────────────
+const getStealthHeaders = () => ({
+  "User-Agent":
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
+  "Accept-Language": "en-US,en;q=0.9",
+  Referer: "https://www.google.com/",
+});
 
 // ─── SOURCE: ATS (Lever/Greenhouse) ─────────────────────────────────────────
 const fetchATS = async (type, companies) => {
@@ -72,23 +61,40 @@ const fetchATS = async (type, companies) => {
           ? `https://api.lever.co/v0/postings/${company.slug}?mode=json`
           : `https://boards-api.greenhouse.io/v1/boards/${company.slug}/jobs`;
 
-      const { data } = await axios.get(url);
+      // Adding a 500ms delay to be polite to the APIs
+      await new Promise((r) => setTimeout(r, 500));
+
+      const { data } = await axios.get(url, { headers: getStealthHeaders() });
       const rawJobs = type === "lever" ? data : data.jobs;
 
-      const mapped = rawJobs.map((j) => {
-        const title = j.text || j.title;
-        return {
-          title,
-          company: company.name,
-          link: j.applyUrl || j.absolute_url,
-          platform: type.toUpperCase(),
-          category: getStrictCategory(title),
-          createdAt: new Date(j.createdAt || j.updated_at || Date.now()),
-        };
-      });
+      const mapped = rawJobs
+        .map((j) => {
+          const title = j.text || j.title;
+          // Strict Filter: Only keep SDE/DA
+          if (
+            !title.toLowerCase().includes("engineer") &&
+            !title.toLowerCase().includes("analyst")
+          )
+            return null;
+
+          return {
+            title,
+            company: company.name,
+            link: j.applyUrl || j.absolute_url,
+            platform: "Direct", // Tagged as Direct for the Trump Cards
+            category: getStrictCategory(title),
+            postedAt: new Date(j.createdAt || j.updated_at || Date.now()),
+            workType: j.location?.name?.toLowerCase().includes("remote")
+              ? "Remote"
+              : "On-site",
+          };
+        })
+        .filter(Boolean);
+
       allJobs.push(...mapped);
+      console.log(`📡 Synced ${mapped.length} jobs from ${company.name}`);
     } catch (e) {
-      console.log(`Skipped ${company.name}`);
+      console.error(`⚠️ Failed to sync ${company.name}: ${e.message}`);
     }
   }
   return allJobs;
@@ -96,41 +102,42 @@ const fetchATS = async (type, companies) => {
 
 // ─── MASTER SYNC ENGINE ─────────────────────────────────────────────────────
 const runMasterScraper = async () => {
-  console.log("🏁 Starting Global Deck Sync...");
+  console.log("🏁 FATJOBS ECOSYSTEM: Initializing Global Sync...");
 
-  const leverCos = [
-    { name: "Netflix", slug: "netflix" },
-    { name: "Figma", slug: "figma" },
-    { name: "Databricks", slug: "databricks" },
-  ];
-  const ghCos = [
-    { name: "Airbnb", slug: "airbnb" },
-    { name: "Reddit", slug: "reddit" },
-  ];
+  try {
+    const results = await Promise.all([
+      fetchATS("lever", TARGETS.lever),
+      fetchATS("greenhouse", TARGETS.greenhouse),
+    ]);
 
-  const results = await Promise.all([
-    fetchLinkedIn("Software Engineer"),
-    fetchLinkedIn("Data Analyst"),
-    fetchATS("lever", leverCos),
-    fetchATS("greenhouse", ghCos),
-  ]);
+    const allJobs = results.flat();
+    let newCount = 0;
 
-  const allJobs = results.flat();
-  let newCount = 0;
+    for (const job of allJobs) {
+      try {
+        // FindOneAndUpdate with upsert ensures NO DUPLICATES based on the link
+        const res = await Job.findOneAndUpdate(
+          { link: job.link },
+          { $set: job },
+          { upsert: true, rawResult: true },
+        );
 
-  for (const job of allJobs) {
-    try {
-      // Use link as unique ID to prevent duplicates
-      const res = await Job.findOneAndUpdate({ link: job.link }, job, {
-        upsert: true,
-        new: true,
-        rawResult: true,
-      });
-      if (!res.lastErrorObject.updatedExisting) newCount++;
-    } catch (e) {}
+        // Check if it was a new document
+        if (!res.lastErrorObject.updatedExisting) {
+          newCount++;
+        }
+      } catch (e) {
+        // Silently skip duplicates or DB errors
+      }
+    }
+
+    console.log(
+      `✅ SYNC COMPLETE: ${newCount} New Early Applicant roles added.`,
+    );
+    return newCount;
+  } catch (err) {
+    console.error("❌ MASTER SCRAPER CRITICAL FAILURE:", err);
   }
-
-  console.log(`✅ Sync Complete. ${newCount} New Trump Cards added.`);
 };
 
 module.exports = { runMasterScraper };

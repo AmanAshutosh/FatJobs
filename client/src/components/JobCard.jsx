@@ -3,12 +3,8 @@ import "../styles/JobCard.css";
 
 const JobCard = ({ job }) => {
   const jobStats = useMemo(() => {
-    // 1. FAIL-SAFE DATE SELECTION
-    // We try postedAt, then createdAt, then fallback to "Now" to prevent crashing
     const rawDate = job.postedAt || job.createdAt || new Date();
     const jobDate = new Date(rawDate);
-
-    // Check if the date is actually valid
     const isValidDate = !isNaN(jobDate.getTime());
     const now = new Date();
     const diffInHours = isValidDate
@@ -18,22 +14,20 @@ const JobCard = ({ job }) => {
     let sClass = "status-pulse";
     let label = "ACTIVE";
 
-    // 2. THE 24/48/72 LOGIC (Strictly for Pulse Color)
     if (diffInHours <= 24) {
-      sClass += " hot"; // Green
+      sClass += " hot";
       label = "NEW";
     } else if (diffInHours <= 48) {
-      sClass += " warm"; // Orange
+      sClass += " warm";
       label = "RECENT";
     } else if (diffInHours <= 72) {
-      sClass += " urgent"; // Red
+      sClass += " urgent";
       label = "URGENT";
     } else {
-      sClass += " cold"; // Grey/Blue
+      sClass += " cold";
       label = "ARCHIVED";
     }
 
-    // 3. FORMAT TIME (With Fallback for invalid dates)
     const timeLabel = isValidDate
       ? jobDate.toLocaleDateString([], { month: "short", day: "numeric" }) +
         " | " +
@@ -47,7 +41,6 @@ const JobCard = ({ job }) => {
     return { sClass, timeLabel, label };
   }, [job.postedAt, job.createdAt]);
 
-  // FINAL RENDER GUARD: Ensure we always return a DIV if the job exists
   if (!job || !job.title) return null;
 
   return (
@@ -56,8 +49,11 @@ const JobCard = ({ job }) => {
         {/* HEADER */}
         <div className="card-header">
           <div className="card-name-role">
-            <h2 title={job.title}>{job.title}</h2>
+            <h2 title={job.title}>
+              <i className="ri-terminal-box-line"></i> {job.title}
+            </h2>
             <p className="card-platform-tag">
+              <i className="ri-shield-check-line"></i>{" "}
               {job.platform?.toUpperCase() || "DIRECT"}
             </p>
           </div>
@@ -82,21 +78,29 @@ const JobCard = ({ job }) => {
         {/* STATS SECTION */}
         <div className="card-stats">
           <div className="stat-row">
-            <span className="stat-key">COMPANY</span>
+            <span className="stat-key">
+              <i className="ri-building-line"></i> COMPANY
+            </span>
             <span className="stat-value">{job.company || "TECH CORP"}</span>
           </div>
           <div className="stat-row">
-            <span className="stat-key">EXPERIENCE</span>
+            <span className="stat-key">
+              <i className="ri-medal-line"></i> EXPERIENCE
+            </span>
             <span className="stat-value">
               {job.experience || "Not Specified"}
             </span>
           </div>
           <div className="stat-row">
-            <span className="stat-key">LOCATION</span>
+            <span className="stat-key">
+              <i className="ri-map-pin-line"></i> LOCATION
+            </span>
             <span className="stat-value">{job.location || "India"}</span>
           </div>
           <div className="stat-row">
-            <span className="stat-key">POSTED AT</span>
+            <span className="stat-key">
+              <i className="ri-calendar-event-line"></i> POSTED AT
+            </span>
             <span className="stat-value">{jobStats.timeLabel}</span>
           </div>
         </div>
@@ -109,7 +113,7 @@ const JobCard = ({ job }) => {
             rel="noopener noreferrer"
             className="apply-file-button"
           >
-            VIEW APPLY FILE
+            <i className="ri-file-list-3-line"></i> VIEW APPLY FILE
           </a>
         </div>
       </div>

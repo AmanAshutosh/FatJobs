@@ -3,59 +3,63 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const nodeCron = require("node-cron");
-const {
-  scrapeGreenhouse,
-  scrapeJSearch,
-  scrapeJobs, // <--- ADD THIS: This is the master function that includes sheet scraping
-} = require("./services/scraperService");
+
+// --- 1. IMPORT ROUTES ---
 const jobRoutes = require("./routes/jobRoutes");
 const authRoutes = require("./routes/authRoutes");
+
+// --- 2. IMPORT MASTER SCRAPERS ---
+// Ensure these names match EXACTLY what is in module.exports in scraperService.js
+const scraperService = require("./services/scraperService");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// --- 3. MIDDLEWARE ---
 app.use(cors({ origin: "*", methods: ["GET", "POST"] }));
 app.use(express.json());
 
-app.get("/", (req, res) =>
-  res.status(200).send("FatJobs Backend is Running!"),
-);
+// --- 4. HEALTH CHECK ---
+app.get("/", (req, res) => res.status(200).send("FatJobs Backend: Active"));
 
+// --- 5. API ROUTE MAPPING ---
 app.use("/api/auth", authRoutes);
-app.use("/api", jobRoutes);
+app.use("/api/jobs", jobRoutes);
 
+// --- 6. CRON JOBS (Defined separately to prevent startup crashes) ---
+const initCrons = () => {
+  // 2-Hour Sync
+  nodeCron.schedule("0 */2 * * *", async () => {
+    console.log("[CRON] starting 120-min sync...");
+    try {
+      if (scraperService.scrapeJobs) await scraperService.scrapeJobs();
+    } catch (err) {
+      console.error("[CRON] scrapeJobs error:", err.message);
+    }
+  });
+
+  // Midnight Sync
+  nodeCron.schedule("0 0 * * *", async () => {
+    console.log("[CRON] starting midnight aggregate...");
+    try {
+      if (scraperService.scrapeJSearch) await scraperService.scrapeJSearch();
+    } catch (err) {
+      console.error("[CRON] JSearch error:", err.message);
+    }
+  });
+};
+
+// --- 7. DB CONNECTION & START ---
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
-    console.log("✅ Cloud Database Linked!");
-
-    // --- TASK 1: EVERY 2 HOURS (The "Sheet & Company Board" Sync) ---
-    nodeCron.schedule("0 */2 * * *", async () => {
-      console.log(" 2-Hour Sync: Sheet Links & Greenhouse Boards...");
-      try {
-        // We call scrapeJobs() now because it contains both
-        // the Sheet logic AND the Greenhouse logic.
-        await scrapeJobs();
-      } catch (err) {
-        console.log("Master sync error:", err.message);
-      }
-    });
-
-    // --- TASK 2: ONCE A DAY (The LinkedIn/JSearch Aggregator) ---
-    nodeCron.schedule("0 0 * * *", async () => {
-      console.log(" Midnight Sync: JSearch Aggregator...");
-      try {
-        await scrapeJSearch();
-      } catch (err) {
-        console.log("JSearch sync error:", err.message);
-      }
-    });
-
+    console.log("[SYSTEM] MongoDB connected");
+    initCrons(); // Start crons only after DB is up
     app.listen(PORT, "0.0.0.0", () => {
-      console.log(`>>> [SYSTEM] Server active on port ${PORT}`);
+      console.log(`[SYSTEM] Server on port ${PORT}`);
     });
   })
   .catch((err) => {
-    console.error("❌ CRITICAL: MongoDB Connection Failed!", err.message);
+    console.error("[CRITICAL] Connection failed:", err.message);
     process.exit(1);
   });

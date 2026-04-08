@@ -20,30 +20,37 @@ router.get("/sync", async (req, res) => {
   }
 });
 
-// 2. FETCH JOBS (WITH TIME & CATEGORY FILTERS)
-router.get("/jobs", async (req, res) => {
+// 2. FETCH JOBS (WITH TIME, SEARCH, & FILTERS)
+router.get("/", async (req, res) => {
   try {
-    const { category, hours, role, workMode } = req.query;
+    const { category, hours, role, workMode, q } = req.query;
     let query = {};
 
-    // --- NEW: FRESHNESS FILTER (72, 48, 24) ---
-    if (hours) {
-      const cutoff = new Date();
-      cutoff.setHours(cutoff.getHours() - parseInt(hours));
-      query.postedAt = { $gte: cutoff };
+    // --- 1. FRESHNESS FILTER (Default to 72h if not specified) ---
+    const lookbackHours = hours ? parseInt(hours) : 72;
+    const cutoff = new Date();
+    cutoff.setHours(cutoff.getHours() - lookbackHours);
+    query.postedAt = { $gte: cutoff };
+
+    // --- 2. KEYWORD SEARCH (Title or Company) ---
+    if (q) {
+      query.$or = [
+        { title: { $regex: q, $options: "i" } },
+        { company: { $regex: q, $options: "i" } },
+      ];
     }
 
-    // --- ROLE FILTER (Intern, Entry, Experienced) ---
+    // --- 3. ROLE FILTER ---
     if (role) {
-      query.role = { $regex: new RegExp(`^${role}$`, "i") };
+      query.experience = { $regex: new RegExp(role, "i") };
     }
 
-    // --- WORK MODE FILTER (Remote, Hybrid, WFO) ---
+    // --- 4. WORK MODE FILTER ---
     if (workMode) {
-      query.workMode = { $regex: new RegExp(`^${workMode}$`, "i") };
+      query.workType = { $regex: new RegExp(workMode, "i") };
     }
 
-    // --- CATEGORY FILTER ---
+    // --- 5. CATEGORY FILTER ---
     if (category) {
       query.category = { $regex: new RegExp(`^${category}$`, "i") };
     }
@@ -53,7 +60,7 @@ router.get("/jobs", async (req, res) => {
       .limit(500)
       .lean();
 
-    // Cache Busting Headers
+    // Cache Busting Headers for Production
     res.set({
       "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
       Pragma: "no-cache",
