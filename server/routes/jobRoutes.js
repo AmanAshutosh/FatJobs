@@ -93,12 +93,15 @@ router.get("/", async (req, res) => {
     if (level) {
       query.level = { $regex: new RegExp(`^${level}$`, "i") };
     } else if (jobType) {
-      // Map legacy jobType values to level
-      const levelMap = { fresher: "Fresher", intern: "Intern", experienced: /SDE-[12+]+|DA|Other/ };
-      if (jobType === "fresher")    query.level = "Fresher";
-      else if (jobType === "intern") query.level = "Intern";
-      // "experienced" maps to SDE-1, SDE-2+, DA, Other
-      else query.level = { $in: ["SDE-1", "SDE-2+", "DA", "Other"] };
+      // Query both `level` (new field) and `jobType` (legacy field) for backward compat
+      const orClause =
+        jobType === "fresher"
+          ? [{ level: "Fresher" },  { jobType: "fresher" }]
+          : jobType === "intern"
+          ? [{ level: "Intern" },   { jobType: "intern" }]
+          : [{ level: { $in: ["SDE-1", "SDE-2+", "DA", "Other"] } }, { jobType: "experienced" }];
+
+      query.$and = [...(query.$and || []), { $or: orClause }];
     }
 
     // Work mode
