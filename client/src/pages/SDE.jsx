@@ -7,77 +7,81 @@ const SDE = () => {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // 1. FILTER STATES
   const [searchTerm, setSearchTerm] = useState("");
-  const [locFilter, setLocFilter] = useState("");
-  const [timeFilter, setTimeFilter] = useState("168"); // Default 7 days
+  const [locFilter,  setLocFilter]  = useState("");
+  const [timeFilter, setTimeFilter] = useState("168");
+  const [typeFilter, setTypeFilter] = useState(""); // fresher | intern | experienced
 
   const fetchSDEDeck = useCallback(
-    async (hours = timeFilter) => {
+    async (hours = timeFilter, jobType = typeFilter) => {
       try {
         setLoading(true);
-        // Fetch with current time window
-        const res = await fetchJobs({ category: "SDE", hours: hours });
-        const jobData = Array.isArray(res.data)
-          ? res.data
-          : res.data.jobs || [];
+        const res = await fetchJobs({ category: "SDE", hours, ...(jobType && { jobType }) });
+        const jobData = Array.isArray(res.data) ? res.data : res.data.jobs || [];
         setJobs(jobData);
       } catch (err) {
-        console.error("❌ SDE Fetch Error:", err);
+        console.error("SDE Fetch Error:", err);
         setJobs([]);
       } finally {
         setLoading(false);
       }
     },
-    [timeFilter],
+    [timeFilter, typeFilter],
   );
 
   useEffect(() => {
     fetchSDEDeck();
-    window.addEventListener("focus", () => fetchSDEDeck());
-    return () => window.removeEventListener("focus", () => fetchSDEDeck());
+    const onFocus = () => fetchSDEDeck();
+    window.addEventListener("focus", onFocus);
+    return () => window.removeEventListener("focus", onFocus);
   }, [fetchSDEDeck]);
 
-  // 2. INSTANT FILTER LOGIC
   const filteredJobs = jobs.filter((job) => {
-    const matchesSearch =
+    const matchSearch =
+      !searchTerm ||
       job.company?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       job.title?.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesLocation =
-      locFilter === "" ||
+    const matchLoc =
+      !locFilter ||
       job.location?.toLowerCase().includes(locFilter.toLowerCase());
 
-    return matchesSearch && matchesLocation;
+    return matchSearch && matchLoc;
   });
 
   const handleTimeChange = (e) => {
     const val = e.target.value;
     setTimeFilter(val);
-    fetchSDEDeck(val); // Re-fetch from backend with new time window
+    fetchSDEDeck(val, typeFilter);
+  };
+
+  const handleTypeChange = (e) => {
+    const val = e.target.value;
+    setTypeFilter(val);
+    fetchSDEDeck(timeFilter, val);
   };
 
   return (
-    <div className="sde-container">
-      <div className="sde-content-wrapper">
-        <header className="sde-header-centered">
-          <div className="role-pulse-badge">
-            <div className="badge-dot"></div>
-            {filteredJobs.length} LIVE ROLES SYNCED
+    <div className="deck-container">
+      <div className="deck-wrapper">
+
+        <header className="deck-header">
+          <div className="deck-badge">
+            <div className="badge-dot" />
+            {filteredJobs.length} LIVE ROLES
           </div>
-          <h1>SDE DECK</h1>
-          <p>
-            The ultimate collection of high-growth Engineering roles from top
-            tech firms.
+          <h1 className="deck-title">SDE DECK</h1>
+          <p className="deck-sub">
+            High-growth Engineering roles from top tech firms — refreshed every 2 hours.
           </p>
 
-          {/* 3. FILTER BAR SECTION */}
+          {/* Filter Bar */}
           <div className="filter-bar">
             <div className="filter-group">
-              <label>Hunt Company / Role</label>
+              <label>Search</label>
               <input
                 type="text"
-                placeholder="e.g. Coinbase..."
+                placeholder="Company or role…"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -85,16 +89,23 @@ const SDE = () => {
 
             <div className="filter-group">
               <label>Location</label>
-              <select
-                value={locFilter}
-                onChange={(e) => setLocFilter(e.target.value)}
-              >
+              <select value={locFilter} onChange={(e) => setLocFilter(e.target.value)}>
                 <option value="">All Locations</option>
                 <option value="Remote">Remote</option>
                 <option value="Bangalore">Bangalore</option>
                 <option value="Noida">Noida</option>
                 <option value="Hyderabad">Hyderabad</option>
                 <option value="USA">USA</option>
+              </select>
+            </div>
+
+            <div className="filter-group">
+              <label>Job Type</label>
+              <select value={typeFilter} onChange={handleTypeChange}>
+                <option value="">All Types</option>
+                <option value="fresher">Fresher / Entry-level</option>
+                <option value="intern">Internship</option>
+                <option value="experienced">Experienced</option>
               </select>
             </div>
 
@@ -111,20 +122,22 @@ const SDE = () => {
 
         <div className="job-grid">
           {loading ? (
-            <div className="loading-state">
-              <h3>Syncing SDE Deck...</h3>
+            <div className="deck-loading">
+              <div className="loading-spinner" />
+              <p>Syncing SDE Deck…</p>
             </div>
           ) : filteredJobs.length > 0 ? (
             filteredJobs.map((job) => (
               <JobCard key={job._id || job.link} job={job} />
             ))
           ) : (
-            <div className="sde-coming-soon-box">
-              <h3>No Matches Found</h3>
-              <p>Try adjusting your filters or checking a wider time range.</p>
+            <div className="deck-empty">
+              <h3>No Roles Found</h3>
+              <p>Try adjusting filters or expanding the time range.</p>
             </div>
           )}
         </div>
+
       </div>
     </div>
   );

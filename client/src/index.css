@@ -1,19 +1,71 @@
-/* index.css */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+/* ============================================================
+   FATJOBS — GLOBAL DESIGN SYSTEM
+   Neumorphism + Glassmorphism | Dark Navy | Neon Yellow
+   ============================================================ */
+
+:root {
+  /* Core Palette */
+  --bg-navy:        #0a0e1a;
+  --bg-navy-light:  #0d1225;
+  --bg-card:        #0f1630;
+
+  /* Neumorphism Shadows */
+  --neu-shadow-out: 6px 6px 16px #05080f, -6px -6px 16px #131b31;
+  --neu-shadow-in:  inset 4px 4px 10px #05080f, inset -4px -4px 10px #131b31;
+  --neu-shadow-hover: 8px 8px 22px #04060c, -8px -8px 22px #161f38;
+
+  /* Glass */
+  --glass-bg:       rgba(15, 22, 48, 0.65);
+  --glass-border:   1px solid rgba(255, 255, 255, 0.07);
+  --glass-blur:     14px;
+
+  /* Brand */
+  --yellow:         #f5e642;
+  --yellow-dim:     rgba(245, 230, 66, 0.12);
+  --yellow-glow:    0 0 20px rgba(245, 230, 66, 0.4);
+
+  /* Status */
+  --green:          #22c55e;
+  --green-glow:     0 0 14px rgba(34, 197, 94, 0.55);
+  --orange:         #f97316;
+  --orange-glow:    0 0 14px rgba(249, 115, 22, 0.55);
+  --grey:           #64748b;
+  --grey-glow:      0 0 10px rgba(100, 116, 139, 0.35);
+
+  /* Text */
+  --text-primary:   #ffffff;
+  --text-secondary: #94a3b8;
+  --text-muted:     #475569;
+
+  /* Typography */
+  --font-main: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  /* Radii */
+  --radius-sm:  8px;
+  --radius-md:  14px;
+  --radius-lg:  20px;
+  --radius-xl:  28px;
+
+  /* Transition */
+  --ease: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-
-html, body {
+/* ---- RESET ---- */
+*, *::before, *::after {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
-  width: 100%;
-  height: 100%;
-  background-color: #000000;
-  color: white;
-  font-family: 'Inter', sans-serif;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-main);
+  background-color: var(--bg-navy);
+  color: var(--text-primary);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }
 
@@ -23,17 +75,14 @@ html, body {
   min-height: 100vh;
 }
 
-/* The Wrapper that holds everything */
 .app-main-layout {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
 }
 
-/* The space creator - makes sure content starts AFTER nav */
 .page-renderer {
-  /* This must be HIGHER than your Navbar height (70px) */
-  padding-top: 40px !important; 
+  padding-top: 72px;
   width: 100%;
   min-height: 100vh;
   display: flex;
@@ -41,3 +90,12 @@ html, body {
   align-items: center;
   box-sizing: border-box;
 }
+
+/* ---- SCROLLBAR ---- */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--bg-navy); }
+::-webkit-scrollbar-thumb { background: #1e2a4a; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--yellow); }
+
+/* ---- SELECTION ---- */
+::selection { background: var(--yellow-dim); color: var(--yellow); }

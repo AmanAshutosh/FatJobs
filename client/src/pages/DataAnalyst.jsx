@@ -1,93 +1,95 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { fetchJobs } from "../api";
 import JobCard from "../components/JobCard";
+import "../styles/SDE.css";
 import "../styles/DataAnalyst.css";
 
 const DataAnalyst = () => {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // 1. FILTER STATES
   const [searchTerm, setSearchTerm] = useState("");
-  const [locFilter, setLocFilter] = useState("");
-  const [timeFilter, setTimeFilter] = useState("168"); // Default 7 days
+  const [locFilter,  setLocFilter]  = useState("");
+  const [timeFilter, setTimeFilter] = useState("168");
+  const [typeFilter, setTypeFilter] = useState("");
 
   const fetchDAJobs = useCallback(
-    async (hours = timeFilter) => {
+    async (hours = timeFilter, jobType = typeFilter) => {
       try {
         setLoading(true);
-        const res = await fetchJobs({ category: "DA", hours: hours });
-        const jobData = Array.isArray(res.data)
-          ? res.data
-          : res.data.jobs || [];
+        const res = await fetchJobs({ category: "DA", hours, ...(jobType && { jobType }) });
+        const jobData = Array.isArray(res.data) ? res.data : res.data.jobs || [];
         setJobs(jobData);
       } catch (error) {
-        console.error("❌ DA Fetch Error:", error);
+        console.error("DA Fetch Error:", error);
         setJobs([]);
       } finally {
         setLoading(false);
       }
     },
-    [timeFilter],
+    [timeFilter, typeFilter],
   );
 
   useEffect(() => {
     fetchDAJobs();
-    window.addEventListener("focus", () => fetchDAJobs());
-    return () => window.removeEventListener("focus", () => fetchDAJobs());
+    const onFocus = () => fetchDAJobs();
+    window.addEventListener("focus", onFocus);
+    return () => window.removeEventListener("focus", onFocus);
   }, [fetchDAJobs]);
 
-  // 2. INSTANT FILTER LOGIC
   const filteredJobs = jobs.filter((job) => {
-    const matchesSearch =
+    const matchSearch =
+      !searchTerm ||
       job.company?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       job.title?.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesLocation =
-      locFilter === "" ||
+    const matchLoc =
+      !locFilter ||
       job.location?.toLowerCase().includes(locFilter.toLowerCase());
 
-    return matchesSearch && matchesLocation;
+    return matchSearch && matchLoc;
   });
 
   const handleTimeChange = (e) => {
     const val = e.target.value;
     setTimeFilter(val);
-    fetchDAJobs(val); // Re-fetch from backend
+    fetchDAJobs(val, typeFilter);
+  };
+
+  const handleTypeChange = (e) => {
+    const val = e.target.value;
+    setTypeFilter(val);
+    fetchDAJobs(timeFilter, val);
   };
 
   return (
-    <div className="da-container">
-      <div className="da-content-wrapper">
-        <header className="da-header-centered">
-          <div className="da-pulse-badge">
-            <div className="da-badge-dot"></div>
+    <div className="deck-container da-deck">
+      <div className="deck-wrapper">
+
+        <header className="deck-header">
+          <div className="deck-badge da-badge">
+            <div className="badge-dot da-dot" />
             {filteredJobs.length} LIVE DATA ROLES
           </div>
-          <h1>DATA DECK</h1>
-          <p>
-            Real-time stream of Data Science and Analytics roles from top tech
-            firms.
+          <h1 className="deck-title">DATA DECK</h1>
+          <p className="deck-sub">
+            Real-time Data Science and Analytics roles from top tech firms — refreshed every 2 hours.
           </p>
 
-          {/* 3. FILTER BAR (Aligned with Blue Branding) */}
-          <div className="da-filter-bar">
-            <div className="da-filter-group">
-              <label>Search Company / Role</label>
+          <div className="filter-bar da-filter-bar">
+            <div className="filter-group">
+              <label>Search</label>
               <input
                 type="text"
-                placeholder="e.g. InMobi..."
+                placeholder="Company or role…"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
 
-            <div className="da-filter-group">
+            <div className="filter-group">
               <label>Location</label>
-              <select
-                value={locFilter}
-                onChange={(e) => setLocFilter(e.target.value)}
-              >
+              <select value={locFilter} onChange={(e) => setLocFilter(e.target.value)}>
                 <option value="">All Locations</option>
                 <option value="Remote">Remote</option>
                 <option value="Bangalore">Bangalore</option>
@@ -97,7 +99,17 @@ const DataAnalyst = () => {
               </select>
             </div>
 
-            <div className="da-filter-group">
+            <div className="filter-group">
+              <label>Job Type</label>
+              <select value={typeFilter} onChange={handleTypeChange}>
+                <option value="">All Types</option>
+                <option value="fresher">Fresher / Entry-level</option>
+                <option value="intern">Internship</option>
+                <option value="experienced">Experienced</option>
+              </select>
+            </div>
+
+            <div className="filter-group">
               <label>Recency</label>
               <select value={timeFilter} onChange={handleTimeChange}>
                 <option value="24">Past 24 Hours</option>
@@ -110,20 +122,22 @@ const DataAnalyst = () => {
 
         <div className="job-grid">
           {loading ? (
-            <div className="loading-state">
-              <h3 className="da-sync-text">🚀 Syncing Data Deck...</h3>
+            <div className="deck-loading">
+              <div className="loading-spinner da-spinner" />
+              <p>Syncing Data Deck…</p>
             </div>
           ) : filteredJobs.length > 0 ? (
             filteredJobs.map((job) => (
               <JobCard key={job._id || job.link} job={job} />
             ))
           ) : (
-            <div className="coming-soon-box">
-              <h3>No Matches Found</h3>
-              <p>Try adjusting your search or recency filters.</p>
+            <div className="deck-empty">
+              <h3>No Data Roles Found</h3>
+              <p>Try adjusting filters or expanding the time range.</p>
             </div>
           )}
         </div>
+
       </div>
     </div>
   );

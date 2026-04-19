@@ -1,169 +1,35 @@
-/* DataAnalyst.css - Premium Blue Analytics Deck */
+/* ============================================================
+   DATA ANALYST DECK — Overrides on top of SDE.css
+   Accent: Sky Blue (#38bdf8) instead of Yellow
+   ============================================================ */
 
-.da-container {
-  min-height: 100vh;
-  width: 100%;
-  background-color: #050810; 
-  position: relative;
-  overflow-x: hidden;
-  padding-bottom: 100px;
+.da-deck.deck-container::before {
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.06) 0%, transparent 70%);
 }
 
-.da-container::before {
-  content: "";
-  position: absolute;
-  top: -5%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 70vw;
-  height: 40vw;
-  background: radial-gradient(circle, rgba(56, 189, 248, 0.12) 0%, transparent 70%);
-  filter: blur(100px);
-  z-index: 0;
-  pointer-events: none;
+/* Blue badge */
+.da-badge {
+  background: rgba(56, 189, 248, 0.1) !important;
+  border-color: rgba(56, 189, 248, 0.3) !important;
+  color: #38bdf8 !important;
+  box-shadow: 0 0 18px rgba(56, 189, 248, 0.25) !important;
 }
 
-.da-content-wrapper {
-  position: relative;
-  z-index: 2;
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 180px 40px 60px 40px; 
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.da-dot {
+  background: #38bdf8 !important;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.6) !important;
 }
 
-.da-header-centered {
-  text-align: center;
-  margin-bottom: 80px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  animation: fadeIn 0.8s ease-out;
+/* Blue filter bar accent */
+.da-filter-bar .filter-group label { color: #38bdf8; }
+.da-filter-bar .filter-group input:focus,
+.da-filter-bar .filter-group select:focus {
+  border-color: rgba(56, 189, 248, 0.4) !important;
+  box-shadow: var(--neu-shadow-in), 0 0 0 2px rgba(56, 189, 248, 0.1) !important;
 }
 
-.da-header-centered h1 {
-  font-size: clamp(3rem, 8vw, 5.5rem);
-  color: #ffffff;
-  margin: 15px 0;
-  text-transform: uppercase;
-  font-weight: 900;
-  letter-spacing: -4px;
-  line-height: 1;
-}
-
-.da-header-centered p {
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 1.2rem;
-  max-width: 650px;
-}
-
-/* FILTER BAR - BLUE THEME */
-.da-filter-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  justify-content: center;
-  margin-top: 40px;
-  padding: 24px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(56, 189, 248, 0.15);
-  border-radius: 20px;
-  backdrop-filter: blur(10px);
-  width: 100%;
-  max-width: 900px;
-}
-
-.da-filter-group {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
-  min-width: 200px;
-}
-
-.da-filter-group label {
-  font-size: 10px;
-  font-weight: 800;
-  color: #38bdf8;
-  text-transform: uppercase;
-  letter-spacing: 1.2px;
-}
-
-.da-filter-group input, 
-.da-filter-group select {
-  width: 100%;
-  background: #0a0f1a;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #ffffff;
-  padding: 12px 16px;
-  border-radius: 10px;
-  font-size: 0.9rem;
-  outline: none;
-  transition: all 0.3s ease;
-}
-
-.da-filter-group input:focus, 
-.da-filter-group select:focus {
-  border-color: #38bdf8;
-  box-shadow: 0 0 15px rgba(56, 189, 248, 0.1);
-}
-
-/* REST OF UI */
-.da-pulse-badge {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: rgba(56, 189, 248, 0.08);
-  border: 1px solid rgba(56, 189, 248, 0.2);
-  padding: 8px 20px;
-  border-radius: 100px;
-  font-size: 0.85rem;
-  font-weight: 800;
-  color: #38bdf8;
-}
-
-.da-badge-dot {
-  width: 10px;
-  height: 10px;
-  background-color: #38bdf8;
-  border-radius: 50%;
-  animation: pulse-blue 2s infinite;
-}
-
-.job-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-  gap: 40px;
-  width: 100%;
-}
-
-.da-sync-text { color: #38bdf8; }
-
-.coming-soon-box {
-  grid-column: 1 / -1;
-  padding: 80px 40px;
-  text-align: center;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px dashed rgba(56, 189, 248, 0.3);
-  border-radius: 32px;
-}
-
-@keyframes pulse-blue {
-  0% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.7); }
-  70% { box-shadow: 0 0 0 12px rgba(56, 189, 248, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0); }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@media (max-width: 768px) {
-  .da-content-wrapper { padding: 140px 20px 40px 20px; }
-  .da-header-centered h1 { font-size: 2.8rem; }
-  .job-grid { grid-template-columns: 1fr; }
-  .da-filter-bar { flex-direction: column; width: 100%; }
+/* Blue loading spinner */
+.da-spinner {
+  border-color: rgba(56, 189, 248, 0.15) !important;
+  border-top-color: #38bdf8 !important;
 }
