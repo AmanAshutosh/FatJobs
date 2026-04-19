@@ -1,43 +1,21 @@
 /* ============================================================
-   LANDING PAGE — Neumorphism + Glassmorphism
+   LANDING PAGE — Pure Neumorphism
+   Dark Navy (#0d1225) · Neon Yellow (#f5e642)
    ============================================================ */
 
 .landing-container {
   min-height: 100vh;
   width: 100%;
-  background-color: var(--bg-navy);
+  background: var(--neu-bg);
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 60px 20px 80px;
-  position: relative;
-  overflow: hidden;
 }
 
-/* Ambient background blobs */
-.bg-glow {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(120px);
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0.12;
-}
-.blob-1 {
-  width: 55vw; height: 55vw;
-  background: radial-gradient(circle, #f5e642 0%, transparent 70%);
-  top: -15%; left: -15%;
-}
-.blob-2 {
-  width: 45vw; height: 45vw;
-  background: radial-gradient(circle, #3b82f6 0%, transparent 70%);
-  bottom: -10%; right: -10%;
-}
-
-/* ---- HERO ---- */
+/* ── Hero ──────────────────────────────────────────────────── */
 .hero-section {
   text-align: center;
-  z-index: 2;
   margin-bottom: 64px;
   width: 100%;
   max-width: 800px;
@@ -49,21 +27,19 @@
   margin-bottom: 32px;
 }
 
+/* Neu pill — extruded from surface */
 .status-pill {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
-  border: var(--glass-border);
+  background: var(--neu-bg);
+  box-shadow: var(--neu-out);
   border-radius: 100px;
-  padding: 9px 22px;
+  padding: 10px 24px;
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 1.5px;
   color: var(--text-secondary);
-  box-shadow: var(--neu-shadow-out);
 }
 
 .pulse-dot {
@@ -76,23 +52,22 @@
 }
 
 @keyframes pulse-ring {
-  0%   { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34,197,94,0.6); }
+  0%   { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34,197,94,0.55); }
   70%  { transform: scale(1);    box-shadow: 0 0 0 8px rgba(34,197,94,0); }
   100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34,197,94,0); }
 }
 
-.pill-text { color: var(--text-primary); }
-.divider   { color: var(--text-muted); }
-.timer-text { color: var(--yellow); font-family: var(--font-mono); }
+.pill-text  { color: var(--text-primary); }
+.divider    { color: var(--text-muted); }
+.timer-text { color: var(--yellow); font-family: var(--font-mono); font-size: 0.68rem; }
 
-/* Main Logo */
+/* Logo */
 .main-logo {
   font-size: clamp(3rem, 8vw, 5.5rem);
   font-weight: 900;
   letter-spacing: -3px;
   margin: 16px 0;
   color: var(--text-primary);
-  text-shadow: 0 0 60px rgba(245, 230, 66, 0.1);
 }
 
 .logo-sync {
@@ -103,66 +78,58 @@
 .hero-subtitle {
   color: var(--text-secondary);
   font-size: 1.05rem;
-  max-width: 540px;
+  max-width: 520px;
   margin: 0 auto;
   line-height: 1.7;
 }
 
-/* ---- CARD GRID ---- */
+/* ── Card Grid ─────────────────────────────────────────────── */
 .glass-button-group {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 28px;
+  gap: 32px;
   width: 100%;
   max-width: 960px;
-  z-index: 2;
 }
 
+/* Neu card — extruded from surface, no glass, no transparency */
 .glass-card {
   position: relative;
-  background: var(--bg-card);
-  box-shadow: var(--neu-shadow-out);
+  background: var(--neu-bg);
+  box-shadow: var(--neu-out);
   border-radius: var(--radius-xl);
   padding: 44px;
   cursor: pointer;
   transition: box-shadow var(--ease), transform var(--ease);
   overflow: hidden;
-  border: var(--glass-border);
-}
-
-/* Inner glass shimmer */
-.glass-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
-  border-radius: inherit;
-  opacity: 0;
-  transition: opacity var(--ease);
 }
 
 .glass-card:hover {
-  transform: translateY(-10px);
-  box-shadow: var(--neu-shadow-hover);
+  box-shadow: var(--neu-hover);
+  transform: translateY(-6px);
 }
-.glass-card:hover::before { opacity: 1; }
 
-.glass-content { position: relative; z-index: 1; }
+.glass-card:active {
+  box-shadow: var(--neu-in);
+  transform: translateY(0);
+}
+
+/* No ::before shimmer — neumorphism is flat */
+.glass-content { position: relative; }
 
 .card-icon {
-  font-size: 2.4rem;
-  margin-bottom: 14px;
-  filter: drop-shadow(0 0 10px rgba(245,230,66,0.3));
+  font-size: 2.2rem;
+  margin-bottom: 16px;
 }
 
 .card-meta {
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 2px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 2.5px;
   color: var(--yellow);
+  text-shadow: var(--yellow-glow);
   margin-bottom: 8px;
+  text-transform: uppercase;
 }
 
 .card-title {
@@ -176,7 +143,7 @@
 .card-desc {
   color: var(--text-muted);
   font-size: 0.9rem;
-  line-height: 1.6;
+  line-height: 1.65;
   margin-bottom: 36px;
 }
 
@@ -185,44 +152,49 @@
   align-items: center;
   justify-content: space-between;
   font-weight: 700;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   letter-spacing: 1.2px;
-  color: var(--text-primary);
+  color: var(--text-secondary);
+  text-transform: uppercase;
 }
 
+/* Arrow button — neu circle */
 .mini-arrow {
-  width: 40px; height: 40px;
-  background: var(--yellow);
-  color: var(--bg-navy);
+  width: 42px; height: 42px;
+  background: var(--neu-bg);
+  box-shadow: var(--neu-out);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   font-size: 1rem;
-  transition: transform var(--ease), box-shadow var(--ease);
-  box-shadow: var(--yellow-glow);
+  color: var(--yellow);
+  transition: box-shadow var(--ease), transform var(--ease);
 }
 
 .glass-card:hover .mini-arrow {
-  transform: translateX(6px) rotate(-45deg);
+  box-shadow: var(--neu-in);
+  transform: translateX(4px) rotate(-45deg);
+  color: var(--yellow);
+  text-shadow: var(--yellow-glow);
 }
 
-/* Card accent lines */
-.sde-theme::after,
-.da-theme::after {
+/* Top ridge — coloured inset line per deck */
+.sde-theme::before,
+.da-theme::before {
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0;
-  height: 3px;
+  height: 4px;
   border-radius: var(--radius-xl) var(--radius-xl) 0 0;
 }
-.sde-theme::after { background: linear-gradient(90deg, var(--yellow), #f97316); }
-.da-theme::after  { background: linear-gradient(90deg, #3b82f6, #22c55e); }
+.sde-theme::before { background: var(--yellow); box-shadow: var(--yellow-glow); }
+.da-theme::before  { background: #38bdf8; box-shadow: 0 0 14px rgba(56,189,248,0.5); }
 
-/* ---- RESPONSIVE ---- */
+/* ── Responsive ────────────────────────────────────────────── */
 @media (max-width: 680px) {
-  .landing-container { padding-top: 40px; }
+  .landing-container  { padding-top: 40px; }
   .glass-button-group { grid-template-columns: 1fr; }
-  .glass-card { padding: 32px 28px; }
+  .glass-card         { padding: 32px 28px; }
 }

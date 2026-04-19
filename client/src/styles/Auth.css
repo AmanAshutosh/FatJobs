@@ -6,7 +6,7 @@
   align-items: center;
   min-height: 100vh;
   width: 100vw;
-  background: #000;
+  background: #0d1225;
   position: relative;
   overflow: hidden;
   mask-image: linear-gradient(to bottom, black 80%, transparent 100%);

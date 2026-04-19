@@ -1,35 +1,35 @@
 /* ============================================================
-   DATA ANALYST DECK — Overrides on top of SDE.css
-   Accent: Sky Blue (#38bdf8) instead of Yellow
+   DATA ANALYST DECK — Pure Neumorphism overrides
+   Accent colour: Sky Blue (#38bdf8) instead of Yellow
    ============================================================ */
 
-.da-deck.deck-container::before {
-  background: radial-gradient(circle, rgba(56, 189, 248, 0.06) 0%, transparent 70%);
-}
+/* Remove any pseudo-element glow (no glassmorphism, no blobs) */
+.da-deck.deck-container::before { display: none; }
 
-/* Blue badge */
+/* Blue badge — same neu shadow, different text colour */
 .da-badge {
-  background: rgba(56, 189, 248, 0.1) !important;
-  border-color: rgba(56, 189, 248, 0.3) !important;
   color: #38bdf8 !important;
-  box-shadow: 0 0 18px rgba(56, 189, 248, 0.25) !important;
+  text-shadow: 0 0 14px rgba(56, 189, 248, 0.5) !important;
+  /* reuse the same neu-out shadow — no glass override */
+  box-shadow: var(--neu-out) !important;
 }
 
 .da-dot {
   background: #38bdf8 !important;
-  box-shadow: 0 0 10px rgba(56, 189, 248, 0.6) !important;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.55) !important;
 }
 
-/* Blue filter bar accent */
+/* Blue label text in filters */
 .da-filter-bar .filter-group label { color: #38bdf8; }
+
+/* Deeper inset on focus — blue tint via glow, no border */
 .da-filter-bar .filter-group input:focus,
 .da-filter-bar .filter-group select:focus {
-  border-color: rgba(56, 189, 248, 0.4) !important;
-  box-shadow: var(--neu-shadow-in), 0 0 0 2px rgba(56, 189, 248, 0.1) !important;
+  box-shadow: inset 6px 6px 16px var(--neu-dark),
+              inset -6px -6px 16px var(--neu-light) !important;
 }
 
-/* Blue loading spinner */
+/* Blue spinner */
 .da-spinner {
-  border-color: rgba(56, 189, 248, 0.15) !important;
   border-top-color: #38bdf8 !important;
 }

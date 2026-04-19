@@ -5,7 +5,7 @@
   inset: 0;
   width: 100vw;
   height: 100vh;
-  background: #020408; /* Darker than background for isolation */
+  background: #0d1225; /* Darker than background for isolation */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -43,7 +43,7 @@
 
 .percentage-display .unit {
   font-size: 1.5rem;
-  color: rgba(255, 255, 255, 0.2);
+  color: #3d4d6a;
   margin-left: 5px;
 }
 
@@ -51,12 +51,13 @@
 .loader-bar-bg {
   width: 100%;
   height: 6px;
-  background: rgba(255, 255, 255, 0.03);
+  background: #07090f;
+  box-shadow: inset 2px 2px 6px #040507, inset -2px -2px 6px #111a2e;
   border-radius: 100px;
   overflow: hidden;
   position: relative;
   margin: 20px 0;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: none;
 }
 
 .loader-bar-fill {
