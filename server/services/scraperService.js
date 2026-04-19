@@ -16,6 +16,7 @@ const { fetchGreenhouse, fetchLever }             = require("../fetchers/atsServ
 const { fetchWWR, fetchCryptoJobsList, fetchWeb3Career, fetchIndeed, fetchRemotive } =
   require("../fetchers/rssService");
 const { fetchNaukri, fetchInternshala, fetchWellfound } = require("../fetchers/stealthService");
+const { fetchLinkedIn }                           = require("../fetchers/linkedinService");
 const { fetchLinkedInViaGoogleDork }              = require("../fetchers/googleDorkService");
 
 // ── Upsert (link is the canonical unique key) ────────────────────────────────
@@ -62,8 +63,8 @@ async function scrapeJobs() {
     ])
   );
 
-  // Phase 2: RSS + Free APIs — parallel
-  console.log("\n── PHASE 2: RSS / Free APIs ──");
+  // Phase 2: RSS + Free APIs + LinkedIn guest API — parallel (no anti-bot risk)
+  console.log("\n── PHASE 2: RSS / Free APIs / LinkedIn ──");
   await runPhase("RSS", () =>
     Promise.all([
       fetchWWR(upsertJob),
@@ -72,6 +73,9 @@ async function scrapeJobs() {
       fetchRemotive(upsertJob),
     ])
   );
+
+  // LinkedIn guest API — sequential (rate-limit between searches)
+  await runPhase("LinkedIn", () => fetchLinkedIn(upsertJob));
 
   // Indeed runs separately — has per-query delays
   await runPhase("Indeed", () => fetchIndeed(upsertJob));

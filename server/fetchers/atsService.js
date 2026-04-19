@@ -12,8 +12,9 @@ const {
 // ── Company Registries ────────────────────────────────────────────────────────
 
 const GREENHOUSE_COMPANIES = [
-  // ── Global Web3 ──
+  // ── Global Web3 / Crypto ──
   { slug: "coinbase",             name: "Coinbase",             domain: "coinbase.com" },
+  { slug: "binance",              name: "Binance",              domain: "binance.com" },     // ★ Added
   { slug: "ripple",               name: "Ripple",               domain: "ripple.com" },
   { slug: "circle",               name: "Circle",               domain: "circle.com" },
   { slug: "fireblocks",           name: "Fireblocks",           domain: "fireblocks.com" },
@@ -29,7 +30,7 @@ const GREENHOUSE_COMPANIES = [
   { slug: "jumpcrypto",           name: "Jump Crypto",          domain: "jump.co" },
   // ── India Web3 ──
   { slug: "polygon",              name: "Polygon",              domain: "polygon.technology" },
-  // ── India Tech ──
+  // ── India Tech (expanded) ──
   { slug: "razorpay",             name: "Razorpay",             domain: "razorpay.com" },
   { slug: "groww",                name: "Groww",                domain: "groww.in" },
   { slug: "slice",                name: "Slice",                domain: "sliceit.com" },
@@ -42,6 +43,9 @@ const GREENHOUSE_COMPANIES = [
   { slug: "innovaccer",           name: "Innovaccer",           domain: "innovaccer.com" },
   { slug: "darwinbox",            name: "Darwinbox",            domain: "darwinbox.com" },
   { slug: "perfios",              name: "Perfios",              domain: "perfios.com" },
+  { slug: "cleartax",             name: "ClearTax",             domain: "cleartax.in" },      // ★ Added
+  { slug: "zerodha",              name: "Zerodha",              domain: "zerodha.com" },       // ★ Added
+  { slug: "swiggy",               name: "Swiggy",               domain: "swiggy.com" },        // ★ Added
   // ── Global Tech ──
   { slug: "github",               name: "GitHub",               domain: "github.com" },
   { slug: "gitlab",               name: "GitLab",               domain: "gitlab.com" },
@@ -61,11 +65,15 @@ const GREENHOUSE_COMPANIES = [
   { slug: "stripe",               name: "Stripe",               domain: "stripe.com" },
   { slug: "wise",                 name: "Wise",                 domain: "wise.com" },
   { slug: "clari",                name: "Clari",                domain: "clari.com" },
+  { slug: "mongodb",              name: "MongoDB",              domain: "mongodb.com" },       // ★ Added
+  { slug: "cockroachlabs",        name: "CockroachDB",          domain: "cockroachlabs.com" }, // ★ Added
+  { slug: "planetscale",          name: "PlanetScale",          domain: "planetscale.com" },   // ★ Added
 ];
 
 const LEVER_COMPANIES = [
   // ── Global Web3 ──
   { slug: "kraken",               name: "Kraken",               domain: "kraken.com" },
+  { slug: "binance",              name: "Binance",              domain: "binance.com" },      // ★ Added (try both ATS)
   { slug: "chainalysis",          name: "Chainalysis",          domain: "chainalysis.com" },
   { slug: "ledger",               name: "Ledger",               domain: "ledger.com" },
   { slug: "opensea",              name: "OpenSea",              domain: "opensea.io" },
@@ -78,15 +86,21 @@ const LEVER_COMPANIES = [
   { slug: "alchemy",              name: "Alchemy",              domain: "alchemy.com" },
   { slug: "nansen",               name: "Nansen",               domain: "nansen.ai" },
   { slug: "anchorage",            name: "Anchorage Digital",    domain: "anchorage.com" },
+  { slug: "bybit",                name: "Bybit",                domain: "bybit.com" },        // ★ Added
+  { slug: "okx",                  name: "OKX",                  domain: "okx.com" },           // ★ Added
   // ── India Web3 / Tech ──
   { slug: "coindcx",              name: "CoinDCX",              domain: "coindcx.com" },
   { slug: "mudrex",               name: "Mudrex",               domain: "mudrex.com" },
   { slug: "cred",                 name: "CRED",                 domain: "cred.club" },
   { slug: "khatabook",            name: "Khatabook",            domain: "khatabook.com" },
+  { slug: "moengage",             name: "MoEngage",             domain: "moengage.com" },     // ★ Added
+  { slug: "lenskart",             name: "Lenskart",             domain: "lenskart.com" },      // ★ Added
   // ── Global Tech ──
   { slug: "pagerduty",            name: "PagerDuty",            domain: "pagerduty.com" },
   { slug: "linear",               name: "Linear",               domain: "linear.app" },
   { slug: "retool",               name: "Retool",               domain: "retool.com" },
+  { slug: "descript",             name: "Descript",             domain: "descript.com" },     // ★ Added
+  { slug: "scale",                name: "Scale AI",             domain: "scale.com" },         // ★ Added
 ];
 
 // ── Upsert wrapper ────────────────────────────────────────────────────────────
@@ -130,6 +144,8 @@ async function fetchGreenhouse(upsertFn) {
 
       for (const j of data.jobs || []) {
         if (!isAllowedRole(j.title)) continue;
+        // Skip clearly senior roles — this platform targets freshers/interns
+        if (classifyLevel(j.title, "", "") === "SDE-2+") continue;
 
         const postedAt = new Date(j.updated_at || j.first_published || Date.now());
         if (!isWithin7Days(postedAt)) continue;
@@ -171,6 +187,7 @@ async function fetchLever(upsertFn) {
 
       for (const j of Array.isArray(data) ? data : []) {
         if (!isAllowedRole(j.text)) continue;
+        if (classifyLevel(j.text, "", "") === "SDE-2+") continue;
 
         const postedAt = new Date(j.createdAt || Date.now());
         if (!isWithin7Days(postedAt)) continue;

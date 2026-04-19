@@ -87,6 +87,11 @@ router.get("/", async (req, res) => {
     // Deck routing (SDE / DA)
     if (category) {
       query.category = { $regex: new RegExp(`^${category}$`, "i") };
+
+      // Default: exclude senior roles on the SDE deck unless caller explicitly asks for them
+      if (category.toUpperCase() === "SDE" && !level && !jobType) {
+        query.level = { $nin: ["SDE-2+", "Other"] };
+      }
     }
 
     // Experience level — supports both new `level` and legacy `jobType`
@@ -104,12 +109,14 @@ router.get("/", async (req, res) => {
       query.$and = [...(query.$and || []), { $or: orClause }];
     }
 
-    // Work mode
+    // Work mode — use $and to avoid conflicting with keyword $or below
     if (workMode) {
-      query.$or = [
-        { type:     { $regex: new RegExp(workMode, "i") } },
-        { workType: { $regex: new RegExp(workMode, "i") } },
-      ];
+      query.$and = [...(query.$and || []), {
+        $or: [
+          { type:     { $regex: new RegExp(workMode, "i") } },
+          { workType: { $regex: new RegExp(workMode, "i") } },
+        ],
+      }];
     }
 
     // Source platform filter
@@ -117,11 +124,12 @@ router.get("/", async (req, res) => {
       query.sourcePlatform = { $regex: new RegExp(source, "i") };
     }
 
-    // Keyword search
+    // Keyword search — use $and to avoid conflicting with workMode $or above
     if (q) {
       const kw = { $regex: q, $options: "i" };
-      const kwClause = [{ title: kw }, { company: kw }];
-      query.$or = query.$or ? [...query.$or, ...kwClause] : kwClause;
+      query.$and = [...(query.$and || []), {
+        $or: [{ title: kw }, { company: kw }],
+      }];
     }
 
     const raw  = await Job.find(query).sort({ postedAt: -1 }).limit(limit).lean();

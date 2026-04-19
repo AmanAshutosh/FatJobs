@@ -112,49 +112,160 @@ function buildDoc({ title, company, logo, location, type, applyUrl, postedAt, so
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 // ── 1. Naukri ─────────────────────────────────────────────────────────────────
-// High-volume Indian job board; strong anti-bot — proxy recommended
+// Uses Naukri's internal JSON API (faster + more reliable than browser scraping).
+// Falls back to Puppeteer if the API rejects the request.
 
-const NAUKRI_QUERIES = [
-  { kw: "software-developer",     exp: "0" },  // freshers
-  { kw: "software-engineer",      exp: "0" },
-  { kw: "web-developer",          exp: "0" },
-  { kw: "data-analyst",           exp: "0" },
-  { kw: "blockchain-developer",   exp: "0" },
-  { kw: "java-developer",         exp: "1" },
-  { kw: "react-developer",        exp: "1" },
-  { kw: "python-developer",       exp: "1" },
+const axios = require("axios");
+
+const NAUKRI_API_QUERIES = [
+  { keyword: "software developer",   exp: 0 },
+  { keyword: "software engineer",    exp: 0 },
+  { keyword: "web developer",        exp: 0 },
+  { keyword: "data analyst",         exp: 0 },
+  { keyword: "react developer",      exp: 0 },
+  { keyword: "python developer",     exp: 0 },
+  { keyword: "blockchain developer", exp: 0 },
+  { keyword: "java developer",       exp: 1 },
 ];
 
-async function fetchNaukri(upsertFn) {
-  console.log("🟠 [STEALTH:Naukri] Starting...");
+// Naukri returns relative dates like "4 days ago" — convert to absolute Date
+function parseNaukriDate(str = "") {
+  const now = Date.now();
+  const m   = str.match(/(\d+)\s*(hour|day|week|month)/i);
+  if (!m) return new Date(now);
+  const n    = parseInt(m[1], 10);
+  const unit = m[2].toLowerCase();
+  const ms   = unit.startsWith("hour")  ? n * 3_600_000
+             : unit.startsWith("day")   ? n * 86_400_000
+             : unit.startsWith("week")  ? n * 604_800_000
+             : n * 2_592_000_000;
+  return new Date(now - ms);
+}
+
+async function fetchNaukriViaAPI(upsertFn) {
+  console.log("🟠 [Naukri:API] Starting...");
+  let saved = 0;
+
+  for (const q of NAUKRI_API_QUERIES) {
+    try {
+      const url = "https://www.naukri.com/jobapi/v3/search?" + new URLSearchParams({
+        noOfResults: 20,
+        urlType:     "search_by_key_loc",
+        searchType:  "adv",
+        keyword:     q.keyword,
+        experienceDD: q.exp,
+        jobAge:      7,
+        version:     15,
+        src:         "jobsearchDesk",
+        loginSrc:    "jobSearch",
+        candidateId: 0,
+        fexp:        q.exp,
+      });
+
+      const { data } = await axios.get(url, {
+        headers: {
+          appid:          "109",
+          systemid:       "109",
+          "User-Agent":   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+          Referer:        "https://www.naukri.com/",
+          Accept:         "application/json",
+        },
+        timeout: 15_000,
+      });
+
+      for (const job of data?.jobDetails || []) {
+        const title    = (job.title || "").trim();
+        const company  = (job.companyName || "").trim();
+        const location = Array.isArray(job.location) ? job.location.join(", ") : (job.placeholders?.[0]?.label || "India");
+        const applyUrl = job.jdURL || job.staticUrl || "";
+
+        if (!title || !applyUrl)    continue;
+        if (!isAllowedRole(title))  continue;
+
+        const level    = classifyLevel(title, "", "");
+        if (level === "SDE-2+")     continue; // skip senior roles
+
+        const postedAt = parseNaukriDate(job.jobDate || "");
+        if (!isWithin7Days(postedAt)) continue;
+
+        await upsertFn(applyUrl, buildDoc({
+          title,
+          company,
+          location,
+          type:           "Onsite",
+          applyUrl,
+          postedAt,
+          sourcePlatform: "Naukri",
+        }));
+        saved++;
+      }
+
+      await sleep(1_200); // gentle rate limit
+    } catch (e) {
+      console.log(`🟡 [Naukri:API] Query "${q.keyword}" failed: ${e.message}`);
+    }
+  }
+
+  console.log(`✅ [Naukri:API] Done — ${saved} jobs upserted.`);
+  return saved;
+}
+
+// Puppeteer fallback with updated selectors for Naukri's 2024+ redesign
+const NAUKRI_BROWSER_QUERIES = [
+  { kw: "software-developer", exp: "0" },
+  { kw: "data-analyst",       exp: "0" },
+  { kw: "web-developer",      exp: "0" },
+];
+
+async function fetchNaukriViaBrowser(upsertFn) {
+  console.log("🟠 [Naukri:Browser] Starting fallback...");
   let saved = 0;
   let browser;
   try {
-    browser = await launchBrowser(true); // use proxy for Naukri
+    browser = await launchBrowser(true);
 
-    for (const q of NAUKRI_QUERIES) {
+    for (const q of NAUKRI_BROWSER_QUERIES) {
       const page = await newStealthPage(browser, true);
       try {
         const url = `https://www.naukri.com/${q.kw}-jobs-${q.exp}?jobAge=7`;
-        await page.goto(url, { waitUntil: "domcontentloaded", timeout: 25_000 });
-        await sleep(2_000 + Math.random() * 1_500);
+        await page.goto(url, { waitUntil: "networkidle2", timeout: 30_000 });
+        await sleep(2_500 + Math.random() * 1_500);
 
+        // Try multiple selector patterns for Naukri's evolving HTML
         const cards = await page.$$eval(
-          "article.jobTuple",
-          (els) =>
-            els.map((el) => ({
-              title:   el.querySelector(".title")?.innerText?.trim() || "",
-              company: el.querySelector(".subTitle")?.innerText?.trim() || "",
-              loc:     el.querySelector(".location")?.innerText?.trim() || "India",
-              link:    el.querySelector("a.title")?.href || "",
-              posted:  el.querySelector(".type time")?.getAttribute("datetime") || "",
-            }))
+          // 2024+ redesign: srp-jobtuple-wrapper; older: article.jobTuple
+          ".srp-jobtuple-wrapper, article.jobTuple",
+          (els) => els.map((el) => ({
+            title:   (
+              el.querySelector("a.title, .row1 a.title, a[title]")?.innerText ||
+              el.querySelector("a.title, .row1 a.title, a[title]")?.getAttribute("title") ||
+              ""
+            ).trim(),
+            company: (
+              el.querySelector(".comp-name, .subTitle, .comp-dtls-wrap .comp-name")?.innerText || ""
+            ).trim(),
+            loc: (
+              el.querySelector(".loc-wrap, .locWdth, .location")?.innerText || "India"
+            ).trim(),
+            link: (
+              el.querySelector("a.title, .row1 a.title")?.href || ""
+            ),
+            posted: (
+              el.querySelector(".job-post-day, span.fleft.grey-text, .type time")?.innerText ||
+              el.querySelector("time")?.getAttribute("datetime") || ""
+            ).trim(),
+          }))
         );
 
         for (const c of cards) {
-          if (!c.title || !c.link)       continue;
-          if (!isAllowedRole(c.title))   continue;
-          if (!isWithin7Days(c.posted || new Date())) continue;
+          if (!c.title || !c.link)    continue;
+          if (!isAllowedRole(c.title)) continue;
+
+          const level = classifyLevel(c.title, "", "");
+          if (level === "SDE-2+")     continue;
+
+          const postedAt = c.posted ? parseNaukriDate(c.posted) : new Date();
+          if (!isWithin7Days(postedAt)) continue;
 
           await upsertFn(c.link, buildDoc({
             title:          c.title,
@@ -162,24 +273,33 @@ async function fetchNaukri(upsertFn) {
             location:       c.loc,
             type:           "Onsite",
             applyUrl:       c.link,
-            postedAt:       c.posted || new Date(),
+            postedAt,
             sourcePlatform: "Naukri",
           }));
           saved++;
         }
       } catch (e) {
-        console.log(`🟡 [STEALTH:Naukri] Query error: ${e.message}`);
+        console.log(`🟡 [Naukri:Browser] Query error: ${e.message}`);
       } finally {
         await page.close();
-        await sleep(3_000 + Math.random() * 2_000); // anti-rate-limit delay
+        await sleep(3_000 + Math.random() * 2_000);
       }
     }
   } catch (e) {
-    console.error("🔴 [STEALTH:Naukri] Browser error:", e.message);
+    console.error("🔴 [Naukri:Browser] Error:", e.message);
   } finally {
     if (browser) await browser.close();
   }
-  console.log(`✅ [STEALTH:Naukri] Done — ${saved} jobs upserted.`);
+  console.log(`✅ [Naukri:Browser] Done — ${saved} jobs upserted.`);
+}
+
+async function fetchNaukri(upsertFn) {
+  // Try JSON API first (faster, no browser needed)
+  const apiSaved = await fetchNaukriViaAPI(upsertFn).catch(() => 0);
+  // Only fall back to browser if API returned nothing
+  if (apiSaved === 0) {
+    await fetchNaukriViaBrowser(upsertFn);
+  }
 }
 
 // ── 2. Internshala ────────────────────────────────────────────────────────────

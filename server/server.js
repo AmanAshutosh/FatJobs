@@ -28,23 +28,13 @@ app.use("/api/jobs", jobRoutes);
 
 // --- 6. CRON JOBS (Defined separately to prevent startup crashes) ---
 const initCrons = () => {
-  // 2-Hour Sync
-  nodeCron.schedule("0 */2 * * *", async () => {
-    console.log("[CRON] starting 120-min sync...");
+  // 30-minute sync (was 2-hour — changed to keep jobs fresh)
+  nodeCron.schedule("*/30 * * * *", async () => {
+    console.log("[CRON] starting 30-min sync...");
     try {
       if (scraperService.scrapeJobs) await scraperService.scrapeJobs();
     } catch (err) {
       console.error("[CRON] scrapeJobs error:", err.message);
-    }
-  });
-
-  // Midnight Sync
-  nodeCron.schedule("0 0 * * *", async () => {
-    console.log("[CRON] starting midnight aggregate...");
-    try {
-      if (scraperService.scrapeJSearch) await scraperService.scrapeJSearch();
-    } catch (err) {
-      console.error("[CRON] JSearch error:", err.message);
     }
   });
 };

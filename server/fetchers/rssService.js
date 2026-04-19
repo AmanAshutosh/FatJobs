@@ -120,7 +120,11 @@ async function fetchCryptoJobsList(upsertFn) {
       const company  = str(item["dc:creator"]) || str(item.author) || "WEB3_CO";
 
       if (!title || !applyUrl)      continue;
+      if (!isAllowedRole(title))    continue;  // ★ was missing — blocked non-tech roles
       if (!isWithin7Days(pubDate))  continue;
+
+      const level = classifyLevel(title, "", "");
+      if (level === "SDE-2+")       continue;
 
       await upsertFn(applyUrl, buildDoc({
         title, company, applyUrl, postedAt: pubDate,
