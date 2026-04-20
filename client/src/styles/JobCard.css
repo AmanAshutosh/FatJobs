@@ -1,202 +1,296 @@
 /* ============================================================
-   JOB CARD — Pure Neumorphism
-   timeCategory → accent color on top ridge & status dot
+   JOB CARD — Top Trumps Style
+   Thick colored border · Light header · Circle avatar · Stats table
+   Border/glow color driven by timeCategory (green / orange / grey)
    ============================================================ */
 
-.job-card {
-  --accent: var(--yellow);
-
+.trump-card {
   width: 100%;
-  max-width: 360px;
-  background: var(--neu-bg);
-  box-shadow: var(--neu-out);
-  border-radius: var(--radius-lg);
-  padding: 24px 22px;
+  max-width: 300px;
+  background: #0b1526;
+  border: 6px solid var(--border, #22c55e);
+  border-radius: 20px;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.04),
+    var(--glow, 0 0 24px rgba(34, 197, 94, 0.4)),
+    0 24px 48px rgba(0, 0, 0, 0.65);
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  position: relative;
-  overflow: hidden;
-  transition: box-shadow var(--ease), transform var(--ease);
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
 }
 
-.job-card:hover {
-  box-shadow: var(--neu-hover);
-  transform: translateY(-6px);
+.trump-card:hover {
+  transform: translateY(-10px) scale(1.02);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.07),
+    0 0 36px var(--border, #22c55e),
+    0 32px 64px rgba(0, 0, 0, 0.75);
 }
 
-/* Coloured top ridge — colour matches timeCategory (set inline) */
-.card-accent-line {
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 4px;
-  background: var(--accent);
-  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-}
-
-/* ── Top row ───────────────────────────────────────────────── */
-.card-top {
+/* ── Header — light strip (matches the real card's white name box) ── */
+.tc-header {
+  background: linear-gradient(135deg, #dce0ea 0%, #c8cdd8 100%);
+  padding: 10px 12px 10px 14px;
   display: flex;
   align-items: flex-start;
-  gap: 14px;
-  padding-top: 6px;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 64px;
 }
 
-/* Neu avatar — inset (recessed) */
-.company-avatar {
-  width: 50px; height: 50px;
+.tc-title-block {
+  flex: 1;
+  min-width: 0;
+}
+
+.tc-job-title {
+  font-size: 0.75rem;
+  font-weight: 900;
+  color: #08111e;
+  line-height: 1.25;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  /* clamp to 2 lines like the card name */
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.tc-level {
+  font-size: 0.6rem;
+  font-weight: 700;
+  margin-top: 4px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+/* Source "flag" — top-right corner, like country flag */
+.tc-source-flag {
+  width: 40px;
+  height: 40px;
   flex-shrink: 0;
-  background: var(--neu-bg);
-  box-shadow: var(--neu-in);
-  border-radius: var(--radius-md);
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.35rem;
-  font-weight: 900;
-  color: var(--accent);
-  text-transform: uppercase;
-}
-
-.card-title-block { flex: 1; min-width: 0; }
-
-.card-job-title {
-  font-size: 0.95rem;
-  font-weight: 800;
-  color: var(--text-primary);
-  white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: 1.3;
-  margin-bottom: 4px;
+  border: 2px solid rgba(255, 255, 255, 0.25);
 }
 
-.card-company {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  font-weight: 600;
+.tc-source-flag img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 5px;
+  background: #fff;
+  border-radius: 6px;
+}
+
+.tc-source-flag span {
+  font-size: 0.62rem;
+  font-weight: 900;
+  color: #fff;
   letter-spacing: 0.5px;
-  text-transform: uppercase;
 }
 
-/* Status pulse dot */
-.status-dot {
-  width: 10px; height: 10px;
-  border-radius: 50%;
-  flex-shrink: 0;
-  margin-top: 5px;
-}
-
-.status-dot.hot  { animation: dot-pulse 1.8s ease-in-out infinite; }
-.status-dot.warm { animation: dot-pulse 2.8s ease-in-out infinite; }
-
-@keyframes dot-pulse {
-  0%, 100% { transform: scale(1);    opacity: 1; }
-  50%       { transform: scale(0.7); opacity: 0.4; }
-}
-
-/* ── Badges ────────────────────────────────────────────────── */
-.card-badges {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 7px;
-}
-
-.badge {
-  font-size: 0.63rem;
-  font-weight: 800;
-  letter-spacing: 1.2px;
-  padding: 5px 12px;
-  border-radius: 100px;
-  text-transform: uppercase;
-  /* Neu pill — extruded */
-  background: var(--neu-bg);
-  box-shadow: 3px 3px 8px var(--neu-dark), -3px -3px 8px var(--neu-light);
-  border: none;
-}
-
-/* time-badge and type-badge get their color set inline */
-.source-badge { color: var(--text-muted); }
-
-/* ── Stats panel — inset/recessed ──────────────────────────── */
-.card-stats {
+/* ── Photo section — dark blue, like the card's gradient photo area ── */
+.tc-photo-section {
+  background: linear-gradient(180deg, #1a3c70 0%, #0e2050 60%, #0b1a3e 100%);
+  padding: 18px 0 14px;
   display: flex;
   flex-direction: column;
-  background: var(--neu-bg);
-  box-shadow: var(--neu-in);
-  border-radius: var(--radius-md);
-  overflow: hidden;
-  padding: 2px 0;
+  align-items: center;
+  gap: 10px;
+  position: relative;
 }
 
-.stat-row {
+/* FATJOBS badge — red sphere, bottom-left of photo (like "TOP TRUMP" badge) */
+.tc-brand-badge {
+  position: absolute;
+  left: 18px;
+  top: 18px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #e84040, #7f0000);
+  border: 2px solid rgba(255, 215, 0, 0.45);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.55), inset 0 1px 2px rgba(255,255,255,0.15);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  z-index: 2;
+}
+
+.tc-brand-top,
+.tc-brand-bot {
+  font-size: 0.46rem;
+  font-weight: 900;
+  color: #ffd700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  line-height: 1.1;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+}
+
+/* Circular avatar ring — gold/accent border like the photo frame */
+.tc-avatar-ring {
+  width: 112px;
+  height: 112px;
+  border-radius: 50%;
+  border: 4px solid var(--border, #22c55e);
+  box-shadow: var(--glow, 0 0 20px rgba(34, 197, 94, 0.5)),
+              inset 0 0 0 3px rgba(255, 215, 0, 0.15);
+  background: #0a1628;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.tc-logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 18px;
+  background: #fff;
+}
+
+.tc-avatar-init {
+  font-size: 3rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  font-family: 'Inter', system-ui, sans-serif;
+  text-shadow: 0 0 20px currentColor;
+}
+
+/* Stars row — like the 3-star rating under the photo */
+.tc-stars {
+  display: flex;
+  gap: 6px;
+}
+
+.tc-star {
+  font-size: 1.5rem;
+  line-height: 1;
+  text-shadow: 0 0 10px currentColor;
+  transition: color 0.2s;
+}
+
+/* Status chip */
+.tc-status-chip {
+  font-size: 0.55rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  padding: 3px 14px;
+  border: 1px solid;
+  border-radius: 100px;
+  text-transform: uppercase;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* ── Stats table — white/light rows like the real card ── */
+.tc-stats {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #e8ecf2;
+}
+
+.tc-stat-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 9px 16px;
-  border-bottom: 1px solid var(--neu-dark);
+  padding: 8px 14px;
+  border-bottom: 1px solid #cdd2dc;
+  background: #f2f4f8;
 }
-.stat-row:last-child { border-bottom: none; }
 
-.stat-key {
-  font-size: 0.65rem;
-  font-weight: 700;
-  letter-spacing: 1px;
-  color: var(--text-muted);
-  display: flex;
-  align-items: center;
-  gap: 5px;
+.tc-stat-row:nth-child(even) {
+  background: #e4e8f0;
+}
+
+.tc-stat-row:last-child {
+  border-bottom: none;
+}
+
+.tc-stat-key {
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  color: #2c3a52;
   text-transform: uppercase;
+  flex-shrink: 0;
 }
 
-.stat-val {
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: var(--text-primary);
+.tc-stat-val {
+  font-size: 0.72rem;
+  font-weight: 900;
+  color: #080e1a;
   text-align: right;
-  max-width: 55%;
+  max-width: 52%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-/* ── Apply button — extruded neu ───────────────────────────── */
-.card-footer { margin-top: auto; padding-top: 2px; }
-
-.apply-btn {
+/* ── Footer — light bar with "FATJOBS FILE" label + apply button ── */
+.tc-footer {
+  background: linear-gradient(135deg, #d0d4de 0%, #bdc2cc 100%);
+  padding: 10px 14px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
-  width: 100%;
-  padding: 14px;
-  background: var(--yellow);
-  color: #07090f;
-  border-radius: var(--radius-md);
-  font-size: 0.8rem;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.tc-footer-label {
+  font-size: 0.52rem;
   font-weight: 900;
-  letter-spacing: 1.4px;
+  letter-spacing: 1.8px;
+  color: #3a4a62;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.tc-apply-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 7px 16px;
+  background: var(--btn-bg, #22c55e);
+  color: #fff;
+  border-radius: 100px;
+  font-size: 0.58rem;
+  font-weight: 900;
+  letter-spacing: 1px;
   text-decoration: none;
   text-transform: uppercase;
-  box-shadow: 4px 4px 12px var(--neu-dark), -2px -2px 6px var(--neu-light), var(--yellow-glow);
-  transition: box-shadow var(--ease), transform var(--ease);
+  white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35),
+              var(--btn-glow, none);
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.apply-btn:hover {
+.tc-apply-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 6px 6px 16px var(--neu-dark), -3px -3px 8px var(--neu-light),
-              0 0 28px rgba(245, 230, 66, 0.55);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45),
+              var(--btn-glow, none);
 }
 
-.apply-btn:active {
+.tc-apply-btn:active {
   transform: translateY(0);
-  box-shadow: inset 3px 3px 8px rgba(0,0,0,0.3), var(--yellow-glow);
 }
 
-.apply-btn i { font-size: 0.88rem; }
-
-/* ── Responsive ────────────────────────────────────────────── */
-@media (max-width: 400px) {
-  .job-card      { padding: 18px 16px; }
-  .card-job-title { font-size: 0.88rem; }
+/* ── Responsive ── */
+@media (max-width: 340px) {
+  .trump-card    { max-width: 100%; }
+  .tc-job-title  { font-size: 0.68rem; }
+  .tc-avatar-ring { width: 96px; height: 96px; }
 }
