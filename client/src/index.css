@@ -7,39 +7,42 @@
   /* ── Single neumorphic surface color ──
      Every surface (body, cards, nav, inputs) MUST share this
      exact background so the extruded shadows look correct.     */
-  --neu-bg:    #0d1225;
+  --neu-bg: #0d1225;
 
   /* Shadow pair derived from --neu-bg */
-  --neu-dark:  #07090f;   /* ~55% darker */
-  --neu-light: #152040;   /* ~35% lighter */
+  --neu-dark: #07090f; /* ~55% darker */
+  --neu-light: #152040; /* ~35% lighter */
 
   /* Neumorphism shadow tokens */
-  --neu-out:   8px 8px 20px var(--neu-dark), -8px -8px 20px var(--neu-light);
-  --neu-in:    inset 5px 5px 14px var(--neu-dark), inset -5px -5px 14px var(--neu-light);
-  --neu-hover: 10px 10px 26px var(--neu-dark), -10px -10px 26px var(--neu-light);
-  --neu-press: inset 3px 3px 8px var(--neu-dark), inset -3px -3px 8px var(--neu-light);
+  --neu-out: 8px 8px 20px var(--neu-dark), -8px -8px 20px var(--neu-light);
+  --neu-in:
+    inset 5px 5px 14px var(--neu-dark), inset -5px -5px 14px var(--neu-light);
+  --neu-hover:
+    10px 10px 26px var(--neu-dark), -10px -10px 26px var(--neu-light);
+  --neu-press:
+    inset 3px 3px 8px var(--neu-dark), inset -3px -3px 8px var(--neu-light);
 
   /* Accent — Neon Yellow */
-  --yellow:     #f5e642;
+  --yellow: #f5e642;
   --yellow-dim: rgba(245, 230, 66, 0.1);
   --yellow-glow: 0 0 18px rgba(245, 230, 66, 0.45);
 
   /* Status colours */
-  --green:       #22c55e;
-  --green-glow:  0 0 12px rgba(34, 197, 94, 0.5);
-  --orange:      #f97316;
+  --green: #22c55e;
+  --green-glow: 0 0 12px rgba(34, 197, 94, 0.5);
+  --orange: #f97316;
   --orange-glow: 0 0 12px rgba(249, 115, 22, 0.5);
-  --grey:        #64748b;
-  --grey-glow:   0 0 8px rgba(100, 116, 139, 0.35);
+  --grey: #64748b;
+  --grey-glow: 0 0 8px rgba(100, 116, 139, 0.35);
 
   /* Text */
-  --text-primary:   #e8eaf0;
+  --text-primary: #e8eaf0;
   --text-secondary: #7a8aaa;
-  --text-muted:     #3d4d6a;
+  --text-muted: #3d4d6a;
 
   /* Typography */
-  --font-main: 'Inter', 'Segoe UI', system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --font-main: "Inter", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", monospace;
 
   /* Border radii */
   --radius-sm: 10px;
@@ -52,8 +55,16 @@
 }
 
 /* ── Reset ────────────────────────────────────────────────── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+html {
+  scroll-behavior: smooth;
+}
 
 body {
   font-family: var(--font-main);
@@ -87,13 +98,22 @@ body {
 }
 
 /* ── Scrollbar ────────────────────────────────────────────── */
-::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-track { background: var(--neu-bg); }
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-track {
+  background: var(--neu-bg);
+}
 ::-webkit-scrollbar-thumb {
   background: var(--neu-light);
   border-radius: 3px;
 }
-::-webkit-scrollbar-thumb:hover { background: var(--yellow); }
+::-webkit-scrollbar-thumb:hover {
+  background: var(--yellow);
+}
 
 /* ── Selection ────────────────────────────────────────────── */
-::selection { background: var(--yellow-dim); color: var(--yellow); }
+::selection {
+  background: var(--yellow-dim);
+  color: var(--yellow);
+}

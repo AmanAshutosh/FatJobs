@@ -8,7 +8,7 @@ const SDE = () => {
   const [loading, setLoading] = useState(true);
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [locFilter,  setLocFilter]  = useState("");
+  const [locFilter, setLocFilter] = useState("");
   const [timeFilter, setTimeFilter] = useState("168");
   const [typeFilter, setTypeFilter] = useState(""); // fresher | intern | experienced
 
@@ -16,8 +16,14 @@ const SDE = () => {
     async (hours = timeFilter, jobType = typeFilter) => {
       try {
         setLoading(true);
-        const res = await fetchJobs({ category: "SDE", hours, ...(jobType && { jobType }) });
-        const jobData = Array.isArray(res.data) ? res.data : res.data.jobs || [];
+        const res = await fetchJobs({
+          category: "SDE",
+          hours,
+          ...(jobType && { jobType }),
+        });
+        const jobData = Array.isArray(res.data)
+          ? res.data
+          : res.data.jobs || [];
         setJobs(jobData);
       } catch (err) {
         console.error("SDE Fetch Error:", err);
@@ -64,7 +70,6 @@ const SDE = () => {
   return (
     <div className="deck-container">
       <div className="deck-wrapper">
-
         <header className="deck-header">
           <div className="deck-badge">
             <div className="badge-dot" />
@@ -72,7 +77,8 @@ const SDE = () => {
           </div>
           <h1 className="deck-title">SDE DECK</h1>
           <p className="deck-sub">
-            High-growth Engineering roles from top tech firms — refreshed every 2 hours.
+            High-growth Engineering roles from top tech firms — refreshed every
+            2 hours.
           </p>
 
           {/* Filter Bar */}
@@ -89,7 +95,10 @@ const SDE = () => {
 
             <div className="filter-group">
               <label>Location</label>
-              <select value={locFilter} onChange={(e) => setLocFilter(e.target.value)}>
+              <select
+                value={locFilter}
+                onChange={(e) => setLocFilter(e.target.value)}
+              >
                 <option value="">All Locations</option>
                 <option value="Remote">Remote</option>
                 <option value="Bangalore">Bangalore</option>
@@ -137,7 +146,6 @@ const SDE = () => {
             </div>
           )}
         </div>
-
       </div>
     </div>
   );

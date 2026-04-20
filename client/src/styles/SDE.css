@@ -52,7 +52,8 @@
 }
 
 .badge-dot {
-  width: 9px; height: 9px;
+  width: 9px;
+  height: 9px;
   background: var(--yellow);
   border-radius: 50%;
   box-shadow: var(--yellow-glow);
@@ -60,9 +61,15 @@
 }
 
 @keyframes dot-badge-pulse {
-  0%   { box-shadow: 0 0 0 0 rgba(245,230,66,0.6); }
-  70%  { box-shadow: 0 0 0 8px rgba(245,230,66,0); }
-  100% { box-shadow: 0 0 0 0 rgba(245,230,66,0); }
+  0% {
+    box-shadow: 0 0 0 0 rgba(245, 230, 66, 0.6);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(245, 230, 66, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(245, 230, 66, 0);
+  }
 }
 
 .deck-title {
@@ -148,10 +155,14 @@
 .filter-group input:focus,
 .filter-group select:focus {
   /* deeper inset on focus */
-  box-shadow: inset 6px 6px 16px var(--neu-dark), inset -6px -6px 16px var(--neu-light);
+  box-shadow:
+    inset 6px 6px 16px var(--neu-dark),
+    inset -6px -6px 16px var(--neu-light);
 }
 
-.filter-group input::placeholder { color: var(--text-muted); }
+.filter-group input::placeholder {
+  color: var(--text-muted);
+}
 
 /* ── Job Grid ──────────────────────────────────────────────── */
 .job-grid {
@@ -174,7 +185,8 @@
 }
 
 .loading-spinner {
-  width: 46px; height: 46px;
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
   /* Neu ring — shadow creates 3D disc */
   box-shadow: var(--neu-out);
@@ -183,7 +195,11 @@
   animation: spin 0.9s linear infinite;
 }
 
-@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 
 /* ── Empty state ───────────────────────────────────────────── */
 .deck-empty {
@@ -204,23 +220,47 @@
   text-shadow: var(--yellow-glow);
 }
 
-.deck-empty p { color: var(--text-muted); font-size: 0.95rem; }
+.deck-empty p {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
 
 /* ── Animation ─────────────────────────────────────────────── */
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(22px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ── Responsive ────────────────────────────────────────────── */
 @media (max-width: 1100px) {
-  .job-grid { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+  .job-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+  }
 }
 
 @media (max-width: 768px) {
-  .deck-wrapper { padding: 40px 20px 60px; }
-  .deck-title   { font-size: 2.6rem; letter-spacing: -2px; }
-  .filter-bar   { flex-direction: column; padding: 20px; }
-  .filter-group { min-width: 100%; }
-  .job-grid     { grid-template-columns: 1fr; }
+  .deck-wrapper {
+    padding: 40px 20px 60px;
+  }
+  .deck-title {
+    font-size: 2.6rem;
+    letter-spacing: -2px;
+  }
+  .filter-bar {
+    flex-direction: column;
+    padding: 20px;
+  }
+  .filter-group {
+    min-width: 100%;
+  }
+  .job-grid {
+    grid-template-columns: 1fr;
+  }
 }

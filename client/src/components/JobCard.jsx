@@ -2,25 +2,25 @@ import React, { useMemo } from "react";
 import "../styles/JobCard.css";
 
 const LEVEL_META = {
-  "Intern":  { label: "INTERNSHIP",    color: "#3b82f6" },
-  "Fresher": { label: "FRESHER / GRAD", color: "#22c55e" },
-  "SDE-1":   { label: "JUNIOR SDE",    color: "#f5e642" },
-  "DA":      { label: "DATA ANALYST",  color: "#a855f7" },
-  "SDE-2+":  { label: "EXPERIENCED",   color: "#f97316" },
-  "Other":   { label: "ENGINEER",      color: "#64748b" },
+  Intern: { label: "INTERNSHIP", color: "#3b82f6" },
+  Fresher: { label: "FRESHER / GRAD", color: "#22c55e" },
+  "SDE-1": { label: "JUNIOR SDE", color: "#f5e642" },
+  DA: { label: "DATA ANALYST", color: "#a855f7" },
+  "SDE-2+": { label: "EXPERIENCED", color: "#f97316" },
+  Other: { label: "ENGINEER", color: "#64748b" },
 };
 
 const SOURCE_COLORS = {
-  LinkedIn:       "#0a66c2",
-  Naukri:         "#ff7555",
-  Greenhouse:     "#3dba56",
-  Lever:          "#2e6df5",
-  Internshala:    "#14b8a6",
+  LinkedIn: "#0a66c2",
+  Naukri: "#ff7555",
+  Greenhouse: "#3dba56",
+  Lever: "#2e6df5",
+  Internshala: "#14b8a6",
   WeWorkRemotely: "#334155",
-  Indeed:         "#2164f3",
-  Remotive:       "#6d28d9",
+  Indeed: "#2164f3",
+  Remotive: "#6d28d9",
   CryptoJobsList: "#f59e0b",
-  Wellfound:      "#ef4444",
+  Wellfound: "#ef4444",
 };
 
 const JobCard = ({ job }) => {
@@ -30,33 +30,70 @@ const JobCard = ({ job }) => {
   const timeData = useMemo(() => {
     if (job.timeCategory) {
       const map = {
-        green:  { color: "#22c55e", glow: "0 0 24px rgba(34,197,94,0.55)",  label: "LIVE",   stars: 3 },
-        orange: { color: "#f97316", glow: "0 0 24px rgba(249,115,22,0.5)",  label: "RECENT", stars: 2 },
-        grey:   { color: "#64748b", glow: "0 0 14px rgba(100,116,139,0.3)", label: "STABLE", stars: 1 },
+        green: {
+          color: "#22c55e",
+          glow: "0 0 24px rgba(34,197,94,0.55)",
+          label: "LIVE",
+          stars: 3,
+        },
+        orange: {
+          color: "#f97316",
+          glow: "0 0 24px rgba(249,115,22,0.5)",
+          label: "RECENT",
+          stars: 2,
+        },
+        grey: {
+          color: "#64748b",
+          glow: "0 0 14px rgba(100,116,139,0.3)",
+          label: "STABLE",
+          stars: 1,
+        },
       };
       return map[job.timeCategory] ?? map.grey;
     }
     const posted = new Date(job.postedAt || job.createdAt || now).getTime();
     const h = (now - posted) / 3_600_000;
-    if (h <= 24) return { color: "#22c55e", glow: "0 0 24px rgba(34,197,94,0.55)",  label: "LIVE",   stars: 3 };
-    if (h <= 72) return { color: "#f97316", glow: "0 0 24px rgba(249,115,22,0.5)",  label: "RECENT", stars: 2 };
-    return             { color: "#64748b", glow: "0 0 14px rgba(100,116,139,0.3)", label: "STABLE", stars: 1 };
+    if (h <= 24)
+      return {
+        color: "#22c55e",
+        glow: "0 0 24px rgba(34,197,94,0.55)",
+        label: "LIVE",
+        stars: 3,
+      };
+    if (h <= 72)
+      return {
+        color: "#f97316",
+        glow: "0 0 24px rgba(249,115,22,0.5)",
+        label: "RECENT",
+        stars: 2,
+      };
+    return {
+      color: "#64748b",
+      glow: "0 0 14px rgba(100,116,139,0.3)",
+      label: "STABLE",
+      stars: 1,
+    };
   }, [job.timeCategory, job.postedAt, job.createdAt, now]);
 
   const timeLabel = useMemo(() => {
     const d = new Date(job.postedAt || job.createdAt || now);
     if (isNaN(d.getTime())) return "Recently";
     const h = (now - d.getTime()) / 3_600_000;
-    if (h < 1)  return "< 1 hour ago";
+    if (h < 1) return "< 1 hour ago";
     if (h < 24) return `${Math.floor(h)}h ago`;
     return `${Math.floor(h / 24)}d ago`;
   }, [job.postedAt, job.createdAt, now]);
 
-  const levelMeta    = LEVEL_META[job.level] ?? LEVEL_META["Other"];
-  const sourceColor  = SOURCE_COLORS[job.sourcePlatform || job.platform] ?? "#334155";
-  const sourceName   = (job.sourcePlatform || job.platform || "DIRECT").toUpperCase();
-  const rating       = timeData.stars === 3 ? 99 : timeData.stars === 2 ? 75 : 50;
-  const companyInit  = (job.company || "J").charAt(0).toUpperCase();
+  const levelMeta = LEVEL_META[job.level] ?? LEVEL_META["Other"];
+  const sourceColor =
+    SOURCE_COLORS[job.sourcePlatform || job.platform] ?? "#334155";
+  const sourceName = (
+    job.sourcePlatform ||
+    job.platform ||
+    "DIRECT"
+  ).toUpperCase();
+  const rating = timeData.stars === 3 ? 99 : timeData.stars === 2 ? 75 : 50;
+  const companyInit = (job.company || "J").charAt(0).toUpperCase();
 
   if (!job?.title) return null;
 
@@ -74,11 +111,17 @@ const JobCard = ({ job }) => {
           </p>
         </div>
         <div className="tc-source-flag" style={{ background: sourceColor }}>
-          {job.logo
-            ? <img src={job.logo} alt={sourceName}
-                onError={(e) => { e.currentTarget.parentElement.innerHTML = `<span>${sourceName.slice(0,2)}</span>`; }} />
-            : <span>{sourceName.slice(0, 2)}</span>
-          }
+          {job.logo ? (
+            <img
+              src={job.logo}
+              alt={sourceName}
+              onError={(e) => {
+                e.currentTarget.parentElement.innerHTML = `<span>${sourceName.slice(0, 2)}</span>`;
+              }}
+            />
+          ) : (
+            <span>{sourceName.slice(0, 2)}</span>
+          )}
         </div>
       </div>
 
@@ -91,7 +134,10 @@ const JobCard = ({ job }) => {
         </div>
 
         {/* Circular avatar with colored ring */}
-        <div className="tc-avatar-ring" style={{ borderColor: timeData.color, boxShadow: timeData.glow }}>
+        <div
+          className="tc-avatar-ring"
+          style={{ borderColor: timeData.color, boxShadow: timeData.glow }}
+        >
           {job.logo ? (
             <img
               className="tc-logo-img"
@@ -120,7 +166,9 @@ const JobCard = ({ job }) => {
             <span
               key={i}
               className="tc-star"
-              style={{ color: i <= timeData.stars ? timeData.color : "#1a2a42" }}
+              style={{
+                color: i <= timeData.stars ? timeData.color : "#1a2a42",
+              }}
             >
               ★
             </span>
@@ -148,7 +196,9 @@ const JobCard = ({ job }) => {
         </div>
         <div className="tc-stat-row">
           <span className="tc-stat-key">WORK MODE</span>
-          <span className="tc-stat-val">{job.workType || job.type || "On-site"}</span>
+          <span className="tc-stat-val">
+            {job.workType || job.type || "On-site"}
+          </span>
         </div>
         <div className="tc-stat-row">
           <span className="tc-stat-key">EXPERIENCE</span>
@@ -162,7 +212,10 @@ const JobCard = ({ job }) => {
         </div>
         <div className="tc-stat-row">
           <span className="tc-stat-key">FATJOBS RATING</span>
-          <span className="tc-stat-val" style={{ color: timeData.color, fontWeight: 900 }}>
+          <span
+            className="tc-stat-val"
+            style={{ color: timeData.color, fontWeight: 900 }}
+          >
             {rating}
           </span>
         </div>

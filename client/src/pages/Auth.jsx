@@ -11,7 +11,7 @@ const Auth = ({ setUser, onNavigate }) => {
   const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  
+
   // Blinker Position States
   const [emailWidth, setEmailWidth] = useState(0);
   const [nameWidth, setNameWidth] = useState(0);
@@ -53,10 +53,14 @@ const Auth = ({ setUser, onNavigate }) => {
       });
       setStep(2);
       setTimer(60);
-      setOtp(""); 
+      setOtp("");
     } catch (err) {
       const msg = err.response?.data?.message || "SYSTEM_OFFLINE";
-      setError(msg === "LIMIT_EXCEEDED: MAXIMUM_5_KEYS_PER_24H" ? "SECURITY_LOCK: MAX_ATTEMPTS_REACHED" : msg);
+      setError(
+        msg === "LIMIT_EXCEEDED: MAXIMUM_5_KEYS_PER_24H"
+          ? "SECURITY_LOCK: MAX_ATTEMPTS_REACHED"
+          : msg,
+      );
     } finally {
       setLoading(false);
     }
@@ -90,7 +94,10 @@ const Auth = ({ setUser, onNavigate }) => {
           <span>● ● ●</span>
         </div>
         <div className="terminal-body">
-          <p className="command-line"> {isSignup ? "INITIALIZING_SIGNUP..." : "EXECUTING_AUTH_v2..."}</p>
+          <p className="command-line">
+            {" "}
+            {isSignup ? "INITIALIZING_SIGNUP..." : "EXECUTING_AUTH_v2..."}
+          </p>
 
           {step === 1 ? (
             <form onSubmit={handleRequest} className="terminal-form">
@@ -98,14 +105,16 @@ const Auth = ({ setUser, onNavigate }) => {
                 <div className="auth-form-group">
                   <p className="prompt">FULL_NAME:</p>
                   <div className="terminal-input-wrapper">
-                    <input 
-                      className="terminal-input" 
-                      required 
+                    <input
+                      className="terminal-input"
+                      required
                       autoComplete="off"
-                      onChange={(e) => handleInputChange(e, "name", setNameWidth)} 
+                      onChange={(e) =>
+                        handleInputChange(e, "name", setNameWidth)
+                      }
                     />
-                    <span 
-                      className="custom-blinker" 
+                    <span
+                      className="custom-blinker"
                       style={{ transform: `translateX(${nameWidth}px)` }}
                     ></span>
                   </div>
@@ -114,32 +123,43 @@ const Auth = ({ setUser, onNavigate }) => {
               <div className="auth-form-group">
                 <p className="prompt">EMAIL_ADDRESS:</p>
                 <div className="terminal-input-wrapper">
-                  <input 
-                    className="terminal-input" 
-                    type="email" 
-                    required 
+                  <input
+                    className="terminal-input"
+                    type="email"
+                    required
                     autoComplete="off"
-                    onChange={(e) => handleInputChange(e, "email", setEmailWidth)} 
+                    onChange={(e) =>
+                      handleInputChange(e, "email", setEmailWidth)
+                    }
                   />
-                  <span 
-                    className="custom-blinker" 
+                  <span
+                    className="custom-blinker"
                     style={{ transform: `translateX(${emailWidth}px)` }}
                   ></span>
                 </div>
               </div>
-              <button type="submit" className="grant-access-btn" disabled={loading}>
+              <button
+                type="submit"
+                className="grant-access-btn"
+                disabled={loading}
+              >
                 {loading ? "TRANSMITTING..." : "[ GENERATE_ACCESS_KEY ]"}
               </button>
-              
+
               <div className="terminal-footer">
-                <span className="toggle-text" onClick={() => { 
-                  setIsSignup(!isSignup); 
-                  setStep(1); 
-                  setError(""); 
-                  setEmailWidth(0); 
-                  setNameWidth(0); 
-                }}>
-                  {isSignup ? "> ALREADY_HAVE_ACCESS? _LOGIN" : "> NEW_USER? _CREATE_ACCOUNT"}
+                <span
+                  className="toggle-text"
+                  onClick={() => {
+                    setIsSignup(!isSignup);
+                    setStep(1);
+                    setError("");
+                    setEmailWidth(0);
+                    setNameWidth(0);
+                  }}
+                >
+                  {isSignup
+                    ? "> ALREADY_HAVE_ACCESS? _LOGIN"
+                    : "> NEW_USER? _CREATE_ACCOUNT"}
                 </span>
               </div>
             </form>
@@ -147,26 +167,32 @@ const Auth = ({ setUser, onNavigate }) => {
             <form onSubmit={handleVerify} className="terminal-form">
               <p className="prompt">ENTER_6_DIGIT_KEY:</p>
               <div className="terminal-input-wrapper">
-                <input 
-                  className="terminal-input code-input" 
-                  maxLength="6" 
-                  value={otp} 
-                  onChange={(e) => setOtp(e.target.value)} 
-                  autoFocus 
+                <input
+                  className="terminal-input code-input"
+                  maxLength="6"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  autoFocus
                 />
               </div>
-              
+
               <p className="spam-hint">!! CHECK_INBOX_OR_SPAM_FOLDER !!</p>
 
               <div className="resend-container">
                 {timer > 0 ? (
                   <p className="timer-text">RESEND_AVAILABLE_IN: {timer}s</p>
                 ) : (
-                  <span className="resend-link" onClick={handleRequest}>{"> RE-GENERATE_ACCESS_KEY"}</span>
+                  <span className="resend-link" onClick={handleRequest}>
+                    {"> RE-GENERATE_ACCESS_KEY"}
+                  </span>
                 )}
               </div>
 
-              <button type="submit" className="grant-access-btn" style={{marginTop: '20px'}}>
+              <button
+                type="submit"
+                className="grant-access-btn"
+                style={{ marginTop: "20px" }}
+              >
                 {loading ? "VERIFYING..." : "[ AUTHORIZE_ACCESS ]"}
               </button>
             </form>

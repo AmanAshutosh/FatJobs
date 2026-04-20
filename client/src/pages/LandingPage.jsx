@@ -49,7 +49,8 @@ const LandingPage = () => {
         </h1>
 
         <p className="hero-subtitle">
-          The ultimate job board for high-growth tech roles.<span className="highlight"></span>
+          The ultimate job board for high-growth tech roles.
+          <span className="highlight"></span>
         </p>
       </header>
 

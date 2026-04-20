@@ -23,7 +23,7 @@
 
 /* 1. TITLE GLITCH EFFECT */
 .loader-title {
-  font-family: 'Courier New', monospace;
+  font-family: "Courier New", monospace;
   color: #22c55e;
   letter-spacing: 6px;
   font-weight: 900;
@@ -37,7 +37,7 @@
   font-weight: 900;
   color: white;
   margin: 10px 0;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   letter-spacing: -4px;
 }
 
@@ -52,7 +52,9 @@
   width: 100%;
   height: 6px;
   background: #07090f;
-  box-shadow: inset 2px 2px 6px #040507, inset -2px -2px 6px #111a2e;
+  box-shadow:
+    inset 2px 2px 6px #040507,
+    inset -2px -2px 6px #111a2e;
   border-radius: 100px;
   overflow: hidden;
   position: relative;
@@ -63,7 +65,7 @@
 .loader-bar-fill {
   height: 100%;
   background: linear-gradient(90deg, #22c55e, #38bdf8);
-  transition: width 0.4s cubic-bezier(0.1, 0.7, 1.0, 0.1);
+  transition: width 0.4s cubic-bezier(0.1, 0.7, 1, 0.1);
   position: relative;
 }
 
@@ -80,7 +82,7 @@
 
 /* 3. STATUS LOGS */
 .loader-status {
-  font-family: 'Courier New', monospace;
+  font-family: "Courier New", monospace;
   color: #38bdf8;
   font-size: 0.75rem;
   letter-spacing: 1px;
@@ -99,26 +101,36 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    rgba(18, 16, 16, 0) 50%,
-    rgba(0, 0, 0, 0.25) 50%
-  ), linear-gradient(
-    90deg,
-    rgba(255, 0, 0, 0.03),
-    rgba(0, 255, 0, 0.01),
-    rgba(0, 0, 255, 0.03)
-  );
-  background-size: 100% 4px, 3px 100%;
+  background:
+    linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+    linear-gradient(
+      90deg,
+      rgba(255, 0, 0, 0.03),
+      rgba(0, 255, 0, 0.01),
+      rgba(0, 0, 255, 0.03)
+    );
+  background-size:
+    100% 4px,
+    3px 100%;
   z-index: 3;
   pointer-events: none;
 }
 
 @keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }

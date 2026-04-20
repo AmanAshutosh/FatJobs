@@ -4,7 +4,9 @@
    ============================================================ */
 
 /* Remove any pseudo-element glow (no glassmorphism, no blobs) */
-.da-deck.deck-container::before { display: none; }
+.da-deck.deck-container::before {
+  display: none;
+}
 
 /* Blue badge — same neu shadow, different text colour */
 .da-badge {
@@ -20,13 +22,16 @@
 }
 
 /* Blue label text in filters */
-.da-filter-bar .filter-group label { color: #38bdf8; }
+.da-filter-bar .filter-group label {
+  color: #38bdf8;
+}
 
 /* Deeper inset on focus — blue tint via glow, no border */
 .da-filter-bar .filter-group input:focus,
 .da-filter-bar .filter-group select:focus {
-  box-shadow: inset 6px 6px 16px var(--neu-dark),
-              inset -6px -6px 16px var(--neu-light) !important;
+  box-shadow:
+    inset 6px 6px 16px var(--neu-dark),
+    inset -6px -6px 16px var(--neu-light) !important;
 }
 
 /* Blue spinner */

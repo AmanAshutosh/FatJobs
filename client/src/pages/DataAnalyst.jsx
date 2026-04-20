@@ -9,7 +9,7 @@ const DataAnalyst = () => {
   const [loading, setLoading] = useState(true);
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [locFilter,  setLocFilter]  = useState("");
+  const [locFilter, setLocFilter] = useState("");
   const [timeFilter, setTimeFilter] = useState("168");
   const [typeFilter, setTypeFilter] = useState("");
 
@@ -17,8 +17,14 @@ const DataAnalyst = () => {
     async (hours = timeFilter, jobType = typeFilter) => {
       try {
         setLoading(true);
-        const res = await fetchJobs({ category: "DA", hours, ...(jobType && { jobType }) });
-        const jobData = Array.isArray(res.data) ? res.data : res.data.jobs || [];
+        const res = await fetchJobs({
+          category: "DA",
+          hours,
+          ...(jobType && { jobType }),
+        });
+        const jobData = Array.isArray(res.data)
+          ? res.data
+          : res.data.jobs || [];
         setJobs(jobData);
       } catch (error) {
         console.error("DA Fetch Error:", error);
@@ -65,7 +71,6 @@ const DataAnalyst = () => {
   return (
     <div className="deck-container da-deck">
       <div className="deck-wrapper">
-
         <header className="deck-header">
           <div className="deck-badge da-badge">
             <div className="badge-dot da-dot" />
@@ -73,7 +78,8 @@ const DataAnalyst = () => {
           </div>
           <h1 className="deck-title">DATA DECK</h1>
           <p className="deck-sub">
-            Real-time Data Science and Analytics roles from top tech firms — refreshed every 2 hours.
+            Real-time Data Science and Analytics roles from top tech firms —
+            refreshed every 2 hours.
           </p>
 
           <div className="filter-bar da-filter-bar">
@@ -89,7 +95,10 @@ const DataAnalyst = () => {
 
             <div className="filter-group">
               <label>Location</label>
-              <select value={locFilter} onChange={(e) => setLocFilter(e.target.value)}>
+              <select
+                value={locFilter}
+                onChange={(e) => setLocFilter(e.target.value)}
+              >
                 <option value="">All Locations</option>
                 <option value="Remote">Remote</option>
                 <option value="Bangalore">Bangalore</option>
@@ -137,7 +146,6 @@ const DataAnalyst = () => {
             </div>
           )}
         </div>
-
       </div>
     </div>
   );

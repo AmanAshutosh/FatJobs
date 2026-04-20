@@ -27,7 +27,8 @@
 }
 
 .avatar-ring {
-  width: 110px; height: 110px;
+  width: 110px;
+  height: 110px;
   border-radius: 35px;
   background: var(--neu-bg);
   box-shadow: var(--neu-out);
@@ -43,15 +44,23 @@
   flex-shrink: 0;
 }
 
-.avatar-ring img { width: 100%; height: 100%; object-fit: cover; }
+.avatar-ring img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 
 .avatar-edit-hint {
   position: absolute;
-  bottom: 0; right: 0;
-  width: 30px; height: 30px;
+  bottom: 0;
+  right: 0;
+  width: 30px;
+  height: 30px;
   background: var(--yellow);
   color: #07090f;
-  display: flex; align-items: center; justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 10px 0 0 0;
   font-size: 0.75rem;
 }
@@ -70,7 +79,12 @@
   margin-top: 4px;
 }
 
-.header-badges { display: flex; gap: 8px; margin-top: 15px; flex-wrap: wrap; }
+.header-badges {
+  display: flex;
+  gap: 8px;
+  margin-top: 15px;
+  flex-wrap: wrap;
+}
 .header-badges span {
   padding: 5px 14px;
   border-radius: 100px;
@@ -79,11 +93,19 @@
   text-transform: uppercase;
   letter-spacing: 1px;
   background: var(--neu-bg);
-  box-shadow: 3px 3px 8px var(--neu-dark), -3px -3px 8px var(--neu-light);
+  box-shadow:
+    3px 3px 8px var(--neu-dark),
+    -3px -3px 8px var(--neu-light);
 }
-.badge-blue   { color: #38bdf8; }
-.badge-green  { color: var(--green); }
-.badge-purple { color: #a855f7; }
+.badge-blue {
+  color: #38bdf8;
+}
+.badge-green {
+  color: var(--green);
+}
+.badge-purple {
+  color: #a855f7;
+}
 
 /* ── Bento Grid ────────────────────────────────────────────── */
 .bento-grid {
@@ -102,7 +124,9 @@
   box-shadow: var(--neu-out);
   border-radius: var(--radius-lg);
   padding: 26px;
-  transition: box-shadow var(--ease), transform var(--ease);
+  transition:
+    box-shadow var(--ease),
+    transform var(--ease);
 }
 
 .bento-tile:hover {
@@ -122,11 +146,24 @@
 }
 
 /* Area assignments */
-.about-tile  { grid-area: about; }
-.resume-tile { grid-area: res; display: flex; flex-direction: column; justify-content: space-between; }
-.exp-tile    { grid-area: exp; }
-.edu-tile    { grid-area: edu; }
-.table-tile  { grid-area: table; }
+.about-tile {
+  grid-area: about;
+}
+.resume-tile {
+  grid-area: res;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.exp-tile {
+  grid-area: exp;
+}
+.edu-tile {
+  grid-area: edu;
+}
+.table-tile {
+  grid-area: table;
+}
 .logout-tile {
   grid-area: log;
   display: flex;
@@ -134,7 +171,9 @@
   justify-content: center;
   align-items: center;
   /* Danger tile — subtle red tint via inset */
-  box-shadow: var(--neu-out), inset 0 0 24px rgba(239, 68, 68, 0.04);
+  box-shadow:
+    var(--neu-out),
+    inset 0 0 24px rgba(239, 68, 68, 0.04);
 }
 
 /* ── Inputs ────────────────────────────────────────────────── */
@@ -154,7 +193,11 @@
   font-family: var(--font-main);
 }
 
-.tile-value { color: var(--text-primary); font-weight: 600; font-size: 0.9rem; }
+.tile-value {
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
 
 .bento-upload {
   background: var(--neu-bg);
@@ -171,7 +214,9 @@
   font-size: 0.8rem;
   transition: box-shadow var(--ease);
 }
-.bento-upload:hover { box-shadow: var(--neu-press); }
+.bento-upload:hover {
+  box-shadow: var(--neu-press);
+}
 
 /* ── Logout ────────────────────────────────────────────────── */
 .control-desc {
@@ -195,12 +240,19 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  transition: box-shadow var(--ease), color var(--ease);
+  transition:
+    box-shadow var(--ease),
+    color var(--ease);
   width: 100%;
   justify-content: center;
 }
-.logout-btn:hover  { box-shadow: var(--neu-hover); color: #ff6060; }
-.logout-btn:active { box-shadow: var(--neu-in); }
+.logout-btn:hover {
+  box-shadow: var(--neu-hover);
+  color: #ff6060;
+}
+.logout-btn:active {
+  box-shadow: var(--neu-in);
+}
 
 /* ── Table ─────────────────────────────────────────────────── */
 .table-header-flex {
@@ -221,9 +273,14 @@
   box-shadow: var(--yellow-glow);
   transition: filter var(--ease);
 }
-.excel-download-btn:hover { filter: brightness(1.1); }
+.excel-download-btn:hover {
+  filter: brightness(1.1);
+}
 
-table { width: 100%; border-collapse: collapse; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
 th {
   text-align: left;
   padding: 12px;
@@ -245,10 +302,16 @@ td {
   font-size: 0.68rem;
   font-weight: 800;
   background: var(--neu-bg);
-  box-shadow: 2px 2px 6px var(--neu-dark), -2px -2px 6px var(--neu-light);
+  box-shadow:
+    2px 2px 6px var(--neu-dark),
+    -2px -2px 6px var(--neu-light);
 }
-.p-status.pending   { color: #ffc107; }
-.p-status.interview { color: var(--green); }
+.p-status.pending {
+  color: #ffc107;
+}
+.p-status.interview {
+  color: var(--green);
+}
 
 /* ── Responsive ────────────────────────────────────────────── */
 @media (max-width: 900px) {
@@ -264,8 +327,15 @@ td {
 }
 
 @media (max-width: 600px) {
-  .bento-header { flex-direction: column; text-align: center; padding: 24px; gap: 20px; }
-  .header-text h1 { font-size: 1.8rem; }
+  .bento-header {
+    flex-direction: column;
+    text-align: center;
+    padding: 24px;
+    gap: 20px;
+  }
+  .header-text h1 {
+    font-size: 1.8rem;
+  }
   .bento-grid {
     grid-template-columns: 1fr;
     grid-template-areas: "about" "res" "exp" "edu" "table" "log";
