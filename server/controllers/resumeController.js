@@ -1,8 +1,6 @@
 'use strict';
 
 const multer = require('multer');
-// Use internal path to avoid pdf-parse test-file crash on import
-const pdfParse = require('pdf-parse/lib/pdf-parse');
 const mammoth = require('mammoth');
 const { analyzeResume } = require('../services/resumeAnalyzerService');
 
@@ -53,6 +51,8 @@ const parsePDF = [
       const mime = req.file.mimetype;
 
       if (mime === 'application/pdf') {
+        // Lazy require avoids pdf-parse loading test files on server startup
+        const pdfParse = require('pdf-parse');
         const data = await pdfParse(req.file.buffer);
         text = data.text;
       } else if (mime === DOCX_MIME || mime === DOC_MIME) {
