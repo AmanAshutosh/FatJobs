@@ -1,6 +1,11 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import axios from "axios";
+import * as pdfjsLib from "pdfjs-dist";
 import "../styles/ResumeAnalyzer.css";
+
+// Use CDN worker so Vite doesn't need to bundle it
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
@@ -254,24 +259,47 @@ export default function ResumeAnalyzer() {
     if (!file) return;
     setError("");
 
+    // Plain text — read directly
     if (file.type === "text/plain") {
       const text = await file.text();
       setForm(f => ({ ...f, text }));
       return;
     }
 
+    // PDF — parse in-browser with PDF.js (no server dependency)
+    if (file.type === "application/pdf") {
+      try {
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        let fullText = "";
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const content = await page.getTextContent();
+          const pageText = content.items.map(item => item.str).join(" ");
+          fullText += pageText + "\n";
+        }
+        if (!fullText.trim() || fullText.trim().length < 30) {
+          setError("Could not extract text from this PDF (may be image-based). Please paste your resume text.");
+          return;
+        }
+        setForm(f => ({ ...f, text: fullText.trim() }));
+      } catch (err) {
+        setError("PDF parsing failed. Please paste your resume text manually.");
+      }
+      return;
+    }
+
+    // DOCX / DOC — send to server (mammoth)
     const DOCX_MIME = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
     const DOC_MIME  = "application/msword";
-    const serverParsed = [DOCX_MIME, DOC_MIME, "application/pdf"];
-
-    if (serverParsed.includes(file.type)) {
+    if (file.type === DOCX_MIME || file.type === DOC_MIME) {
       const formData = new FormData();
       formData.append("pdf", file);
       try {
         const { data } = await axios.post(`${API}/api/resume/parse-pdf`, formData);
         setForm(f => ({ ...f, text: data.text }));
       } catch (err) {
-        const msg = err.response?.data?.error || "File parsing failed. Please paste your resume text manually.";
+        const msg = err.response?.data?.error || "DOCX parsing failed. Please paste your resume text manually.";
         setError(msg);
       }
       return;
