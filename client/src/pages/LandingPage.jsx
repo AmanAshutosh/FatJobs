@@ -85,6 +85,27 @@ const LandingPage = () => {
           </div>
         </div>
       </div>
+
+      <div className="resume-cta-wrap">
+        <div className="resume-cta-card" onClick={() => navigate("/resume")}>
+          <div className="resume-cta-left">
+            <span className="resume-cta-badge">⚡ NEW</span>
+            <h3 className="resume-cta-title">Resume Analyzer</h3>
+            <p className="resume-cta-desc">
+              Get your ATS score, fix keyword gaps, rewrite weak bullets, and download an optimized resume — in seconds.
+            </p>
+          </div>
+          <div className="resume-cta-right">
+            <div className="resume-cta-stats">
+              <span>ATS Score</span>
+              <span>Keyword Gap</span>
+              <span>Bullet Rewriter</span>
+              <span>2025 Trends</span>
+            </div>
+            <div className="mini-arrow resume-cta-arrow">➜</div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

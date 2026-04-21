@@ -53,6 +53,13 @@ const Navbar = ({ onNavigate, user }) => {
           >
             DATA
           </a>
+          <a
+            href="/resume"
+            onClick={(e) => handleLinkClick(e, "/resume")}
+            className={`resume-nav-link ${location.pathname === "/resume" ? "active" : ""}`}
+          >
+            ⚡ RESUME
+          </a>
           {/* Toggle between Login and Profile based on User state */}
           <a
             href={user ? "/profile" : "/login"}

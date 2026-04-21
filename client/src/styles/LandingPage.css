@@ -225,6 +225,105 @@
   box-shadow: 0 0 14px rgba(56, 189, 248, 0.5);
 }
 
+/* ── Resume CTA Card ────────────────────────────────────────── */
+.resume-cta-wrap {
+  width: 100%;
+  max-width: 960px;
+  margin-top: 24px;
+}
+
+.resume-cta-card {
+  background: var(--neu-bg);
+  box-shadow: var(--neu-out);
+  border-radius: var(--radius-xl);
+  padding: 32px 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  cursor: pointer;
+  border-top: 4px solid var(--yellow);
+  box-shadow: var(--neu-out), 0 0 20px rgba(245, 230, 66, 0.08);
+  transition:
+    box-shadow var(--ease),
+    transform var(--ease);
+}
+
+.resume-cta-card:hover {
+  box-shadow: var(--neu-hover), 0 0 32px rgba(245, 230, 66, 0.15);
+  transform: translateY(-4px);
+}
+
+.resume-cta-card:active {
+  box-shadow: var(--neu-in);
+  transform: translateY(0);
+}
+
+.resume-cta-left {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.resume-cta-badge {
+  display: inline-block;
+  background: var(--yellow-dim);
+  color: var(--yellow);
+  border: 1px solid rgba(245, 230, 66, 0.3);
+  border-radius: 100px;
+  padding: 3px 12px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-shadow: var(--yellow-glow);
+  width: fit-content;
+}
+
+.resume-cta-title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.5px;
+  margin: 0;
+}
+
+.resume-cta-desc {
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  line-height: 1.6;
+  max-width: 420px;
+  margin: 0;
+}
+
+.resume-cta-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 20px;
+  flex-shrink: 0;
+}
+
+.resume-cta-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-end;
+}
+
+.resume-cta-stats span {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--yellow);
+  letter-spacing: 0.5px;
+  text-shadow: var(--yellow-glow);
+  opacity: 0.8;
+}
+
+.resume-cta-arrow {
+  color: var(--yellow);
+  text-shadow: var(--yellow-glow);
+}
+
 /* ── Responsive ────────────────────────────────────────────── */
 @media (max-width: 680px) {
   .landing-container {
@@ -235,5 +334,20 @@
   }
   .glass-card {
     padding: 32px 28px;
+  }
+  .resume-cta-card {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 28px;
+  }
+  .resume-cta-right {
+    align-items: flex-start;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .resume-cta-stats {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
   }
 }

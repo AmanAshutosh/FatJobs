@@ -106,6 +106,22 @@
   text-shadow: var(--yellow-glow);
 }
 
+/* ── Resume Analyzer link — highlighted pill ───────────────────────────── */
+.resume-nav-link {
+  background: var(--yellow-dim) !important;
+  color: var(--yellow) !important;
+  border: 1px solid rgba(245, 230, 66, 0.25);
+  box-shadow: none !important;
+}
+.resume-nav-link:hover {
+  box-shadow: 0 0 14px rgba(245, 230, 66, 0.3) !important;
+  background: rgba(245, 230, 66, 0.15) !important;
+}
+.resume-nav-link.active {
+  box-shadow: var(--neu-in) !important;
+  text-shadow: var(--yellow-glow);
+}
+
 @media (max-width: 540px) {
   .nav-links a {
     padding: 6px 10px;

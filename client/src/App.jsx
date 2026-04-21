@@ -14,6 +14,7 @@ import LandingPage from "./pages/LandingPage";
 import SDE from "./pages/SDE";
 import DataAnalyst from "./pages/DataAnalyst";
 import Profile from "./pages/Profile";
+import ResumeAnalyzer from "./pages/ResumeAnalyzer";
 import "./index.css";
 import { Analytics } from "@vercel/analytics/react";
 
@@ -90,6 +91,7 @@ const AppContent = () => {
               )
             }
           />
+          <Route path="/resume" element={<ResumeAnalyzer />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>

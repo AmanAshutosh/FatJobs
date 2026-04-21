@@ -7,6 +7,7 @@ const nodeCron = require("node-cron");
 // --- 1. IMPORT ROUTES ---
 const jobRoutes = require("./routes/jobRoutes");
 const authRoutes = require("./routes/authRoutes");
+const resumeRoutes = require("./routes/resumeRoutes");
 
 // --- 2. IMPORT MASTER SCRAPERS ---
 // Ensure these names match EXACTLY what is in module.exports in scraperService.js
@@ -16,8 +17,8 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // --- 3. MIDDLEWARE ---
-app.use(cors({ origin: "*", methods: ["GET", "POST"] }));
-app.use(express.json());
+app.use(cors({ origin: "*", methods: ["GET", "POST", "OPTIONS"] }));
+app.use(express.json({ limit: "2mb" }));
 
 // --- 4. HEALTH CHECK ---
 app.get("/", (req, res) => res.status(200).send("FatJobs Backend: Active"));
@@ -25,6 +26,7 @@ app.get("/", (req, res) => res.status(200).send("FatJobs Backend: Active"));
 // --- 5. API ROUTE MAPPING ---
 app.use("/api/auth", authRoutes);
 app.use("/api/jobs", jobRoutes);
+app.use("/api/resume", resumeRoutes);
 
 // --- 6. CRON JOBS (Defined separately to prevent startup crashes) ---
 const initCrons = () => {
