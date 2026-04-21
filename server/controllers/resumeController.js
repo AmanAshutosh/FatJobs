@@ -1,15 +1,21 @@
 'use strict';
 
 const multer = require('multer');
-const pdfParse = require('pdf-parse');
+// Use internal path to avoid pdf-parse test-file crash on import
+const pdfParse = require('pdf-parse/lib/pdf-parse');
+const mammoth = require('mammoth');
 const { analyzeResume } = require('../services/resumeAnalyzerService');
+
+const DOCX_MIME = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+const DOC_MIME  = 'application/msword';
 
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB max
   fileFilter: (_, file, cb) => {
-    if (file.mimetype === 'application/pdf' || file.mimetype === 'text/plain') cb(null, true);
-    else cb(new Error('Only PDF or TXT files are supported'));
+    const allowed = ['application/pdf', 'text/plain', DOCX_MIME, DOC_MIME];
+    if (allowed.includes(file.mimetype)) cb(null, true);
+    else cb(new Error('Only PDF, DOCX, DOC, or TXT files are supported'));
   }
 });
 
@@ -44,9 +50,14 @@ const parsePDF = [
       if (!req.file) return res.status(400).json({ error: 'No file uploaded.' });
 
       let text = '';
-      if (req.file.mimetype === 'application/pdf') {
+      const mime = req.file.mimetype;
+
+      if (mime === 'application/pdf') {
         const data = await pdfParse(req.file.buffer);
         text = data.text;
+      } else if (mime === DOCX_MIME || mime === DOC_MIME) {
+        const result = await mammoth.extractRawText({ buffer: req.file.buffer });
+        text = result.value;
       } else {
         text = req.file.buffer.toString('utf-8');
       }

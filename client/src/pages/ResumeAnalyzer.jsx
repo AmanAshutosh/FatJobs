@@ -260,19 +260,24 @@ export default function ResumeAnalyzer() {
       return;
     }
 
-    if (file.type === "application/pdf") {
+    const DOCX_MIME = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+    const DOC_MIME  = "application/msword";
+    const serverParsed = [DOCX_MIME, DOC_MIME, "application/pdf"];
+
+    if (serverParsed.includes(file.type)) {
       const formData = new FormData();
       formData.append("pdf", file);
       try {
         const { data } = await axios.post(`${API}/api/resume/parse-pdf`, formData);
         setForm(f => ({ ...f, text: data.text }));
-      } catch {
-        setError("PDF parsing failed. Please paste your resume text manually.");
+      } catch (err) {
+        const msg = err.response?.data?.error || "File parsing failed. Please paste your resume text manually.";
+        setError(msg);
       }
       return;
     }
 
-    setError("Only PDF or TXT files are supported.");
+    setError("Only PDF, DOCX, DOC, or TXT files are supported.");
   }, []);
 
   const onDrop = useCallback((e) => {
@@ -349,7 +354,7 @@ export default function ResumeAnalyzer() {
             onDrop={onDrop}
             onClick={() => !form.text && fileRef.current?.click()}
           >
-            <input ref={fileRef} type="file" accept=".pdf,.txt" hidden onChange={e => handleFile(e.target.files[0])} />
+            <input ref={fileRef} type="file" accept=".pdf,.docx,.doc,.txt" hidden onChange={e => handleFile(e.target.files[0])} />
 
             {form.text ? (
               <div className="drop-has-content">
@@ -360,9 +365,9 @@ export default function ResumeAnalyzer() {
             ) : (
               <>
                 <div className="drop-icon">📄</div>
-                <p className="drop-title">Drag & Drop your PDF or TXT</p>
+                <p className="drop-title">Drag & Drop your Resume</p>
                 <p className="drop-or">or click to browse files</p>
-                <span className="drop-hint">PDF · TXT · Max 5MB</span>
+                <span className="drop-hint">PDF · DOCX · DOC · TXT · Max 5MB</span>
               </>
             )}
           </div>
