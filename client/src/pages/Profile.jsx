@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import {
-  User, MapPin, Globe, Github, Linkedin, Camera, Download,
+  User, MapPin, Globe, Link2, Camera, Download,
   Plus, Trash2, Edit2, Check, X, ChevronUp, ChevronDown,
   Briefcase, Code2, GraduationCap, Award, Star, LogOut,
   ExternalLink, Tag,
@@ -146,12 +146,12 @@ export default function Profile({ user, onLogout }) {
                 onChange={e => set("website", e.target.value)} />
             </div>
             <div>
-              <label className="field-label"><Linkedin size={12} /> LinkedIn</label>
+              <label className="field-label"><Link2 size={12} /> LinkedIn</label>
               <input className="prof-input" placeholder="linkedin.com/in/yourname" value={profile.linkedin}
                 onChange={e => set("linkedin", e.target.value)} />
             </div>
             <div>
-              <label className="field-label"><Github size={12} /> GitHub</label>
+              <label className="field-label"><Link2 size={12} /> GitHub</label>
               <input className="prof-input" placeholder="github.com/yourname" value={profile.github}
                 onChange={e => set("github", e.target.value)} />
             </div>
@@ -166,8 +166,8 @@ export default function Profile({ user, onLogout }) {
           <div className="about-meta">
             {profile.location && <span><MapPin size={13} /> {profile.location}</span>}
             {profile.website  && <a href={profile.website}   target="_blank" rel="noreferrer"><Globe size={13} /> Portfolio</a>}
-            {profile.linkedin && <a href={`https://${profile.linkedin}`} target="_blank" rel="noreferrer"><Linkedin size={13} /> LinkedIn</a>}
-            {profile.github   && <a href={`https://${profile.github}`}   target="_blank" rel="noreferrer"><Github size={13} /> GitHub</a>}
+            {profile.linkedin && <a href={`https://${profile.linkedin}`} target="_blank" rel="noreferrer"><Link2 size={13} /> LinkedIn</a>}
+            {profile.github   && <a href={`https://${profile.github}`}   target="_blank" rel="noreferrer"><Link2 size={13} /> GitHub</a>}
           </div>
         </div>
       )}
@@ -375,7 +375,7 @@ export default function Profile({ user, onLogout }) {
                   </div>
                   <div className="entry-edit-grid-2" style={{ marginTop: 12 }}>
                     <div>
-                      <label className="field-label"><Github size={12} /> GitHub</label>
+                      <label className="field-label"><Link2 size={12} /> GitHub</label>
                       <input className="prof-input" placeholder="https://github.com/..." value={proj.github}
                         onChange={e => updateItem("projects", proj.id, { github: e.target.value })} />
                     </div>
@@ -395,7 +395,7 @@ export default function Profile({ user, onLogout }) {
                   <div className="proj-view-header">
                     <h3 className="proj-title">{proj.title || "Untitled Project"}</h3>
                     <div className="proj-links">
-                      {proj.github && <a href={proj.github} target="_blank" rel="noreferrer"><Github size={16} /></a>}
+                      {proj.github && <a href={proj.github} target="_blank" rel="noreferrer"><Link2 size={16} /></a>}
                       {proj.live   && <a href={proj.live}   target="_blank" rel="noreferrer"><ExternalLink size={16} /></a>}
                       <button className="entry-edit-icon no-print" onClick={() => { setEditing(`proj-${proj.id}`); setStackInput(""); }}><Edit2 size={15} /></button>
                     </div>
@@ -674,8 +674,8 @@ export default function Profile({ user, onLogout }) {
             />
             <div className="prof-header-meta">
               {profile.location && <span><MapPin size={13} /> {profile.location}</span>}
-              {profile.linkedin && <a href={`https://${profile.linkedin}`} target="_blank" rel="noreferrer"><Linkedin size={13} /></a>}
-              {profile.github   && <a href={`https://${profile.github}`}   target="_blank" rel="noreferrer"><Github size={13} /></a>}
+              {profile.linkedin && <a href={`https://${profile.linkedin}`} target="_blank" rel="noreferrer"><Link2 size={13} /></a>}
+              {profile.github   && <a href={`https://${profile.github}`}   target="_blank" rel="noreferrer"><Link2 size={13} /></a>}
               {profile.website  && <a href={profile.website}               target="_blank" rel="noreferrer"><Globe size={13} /></a>}
             </div>
           </div>
