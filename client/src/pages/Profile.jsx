@@ -78,13 +78,13 @@ export default function Profile({ user, onLogout }) {
 
   const completion = (() => {
     let pts = 0;
-    if (profile.summary?.trim().length > 20)              pts += 15;
+    if (profile.summary?.trim().length > 20) pts += 15;
     if (Object.values(profile.skills).flat().length >= 3) pts += 15;
-    if (profile.experience.length >= 1)                   pts += 20;
-    if (profile.projects.length >= 1)                     pts += 15;
-    if (profile.education.length >= 1)                    pts += 15;
-    if (profile.certifications.length >= 1)               pts += 10;
-    if (profile.featured.length >= 1)                     pts += 10;
+    if (profile.experience.some(e => e.role?.trim() || e.company?.trim())) pts += 20;
+    if (profile.projects.some(p => p.title?.trim())) pts += 15;
+    if (profile.education.some(e => e.degree?.trim() || e.institution?.trim())) pts += 15;
+    if (profile.certifications.some(c => c.name?.trim())) pts += 10;
+    if (profile.featured.some(f => f.title?.trim())) pts += 10;
     return pts;
   })();
 
