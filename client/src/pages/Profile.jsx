@@ -17,6 +17,21 @@ const BLANK_EDU  = () => ({ id: uid(), degree: "", institution: "", year: "", gr
 const BLANK_CERT = () => ({ id: uid(), name: "", provider: "", date: "", link: "" });
 const BLANK_FEAT = () => ({ id: uid(), title: "", description: "", link: "", type: "Project" });
 
+function isValidUrl(str) {
+  if (!str?.trim()) return false;
+  try {
+    const urlStr = /^https?:\/\//i.test(str.trim()) ? str.trim() : `https://${str.trim()}`;
+    const { hostname } = new URL(urlStr);
+    const parts = hostname.split(".");
+    return parts.length >= 2 && parts.every(p => p.length > 0) && parts[parts.length - 1].length >= 2;
+  } catch { return false; }
+}
+
+function normalizeUrl(str) {
+  if (!str?.trim()) return "";
+  return /^https?:\/\//i.test(str.trim()) ? str.trim() : `https://${str.trim()}`;
+}
+
 function loadProfile(user) {
   try {
     const saved = JSON.parse(localStorage.getItem("fatjobs_profile") || "{}");
@@ -56,6 +71,7 @@ export default function Profile({ user, onLogout }) {
   const [editing, setEditing]         = useState(null);
   const [skillInputs, setSkillInputs] = useState({});
   const [stackInput, setStackInput]   = useState("");
+  const [urlErrors, setUrlErrors]     = useState({});
   const fileRef = useRef(null);
 
   useEffect(() => {
