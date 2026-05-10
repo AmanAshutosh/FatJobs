@@ -9,7 +9,7 @@
   background: #fff;
   border: 3px solid #000;
   border-radius: 0;
-  box-shadow: 6px 6px 0 #000;
+  box-shadow: 6px 6px 0 var(--nb-yellow);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -19,12 +19,12 @@
 
 .trump-card:hover {
   transform: translate(-3px, -3px);
-  box-shadow: 9px 9px 0 #000;
+  box-shadow: 9px 9px 0 var(--nb-yellow);
 }
 
 .trump-card:active {
   transform: translate(2px, 2px);
-  box-shadow: 3px 3px 0 #000;
+  box-shadow: 3px 3px 0 var(--nb-yellow);
 }
 
 /* ── Header ─────────────────────────────────────────────────── */
@@ -91,7 +91,7 @@
 
 /* ── Photo / company section ────────────────────────────────── */
 .tc-photo-section {
-  background: var(--nb-yellow);
+  background: #FFF8C0;
   padding: 18px 0 14px;
   display: flex;
   flex-direction: column;
