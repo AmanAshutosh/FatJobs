@@ -61,7 +61,7 @@ router.post("/request-otp", async (req, res) => {
 
     // ✅ UPDATED: Now sending from your verified professional domain
     const { data, error } = await resend.emails.send({
-      from: "FatJobs <auth@fatjobs.in>",
+      from: "FatJobs <onboarding@resend.dev>",
       to: email,
       subject: "SECURITY_ACCESS_CODE",
       html: `
