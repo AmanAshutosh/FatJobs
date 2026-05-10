@@ -38,9 +38,6 @@ app.use(
   }),
 );
 
-// Ensure preflight OPTIONS is handled for all routes
-app.options("*", cors());
-
 app.use(express.json({ limit: "2mb" }));
 
 // --- 4. HEALTH CHECK ---
