@@ -68,9 +68,9 @@ body {
   font-family: var(--font-main);
   background-color: var(--nb-bg);
   background-image:
-    linear-gradient(rgba(0,0,0,0.045) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,0,0,0.045) 1px, transparent 1px);
-  background-size: 40px 40px;
+    linear-gradient(rgba(0,0,0,0.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.09) 1px, transparent 1px);
+  background-size: 44px 44px;
   color: var(--nb-text);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
