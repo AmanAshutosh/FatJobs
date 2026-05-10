@@ -1,75 +1,73 @@
 /* ============================================================
-   FATJOBS — GLOBAL DESIGN SYSTEM
-   Pure Neumorphism | Dark Navy | Neon Yellow
+   FATJOBS — NEO-BRUTALISM DESIGN SYSTEM
+   Cream bg · Black borders · Offset shadows · Hard corners
    ============================================================ */
 
 :root {
-  /* ── Single neumorphic surface color ──
-     Every surface (body, cards, nav, inputs) MUST share this
-     exact background so the extruded shadows look correct.     */
-  --neu-bg: #0d1225;
+  /* Surfaces */
+  --nb-bg: #FFFEF0;
+  --nb-card: #FFFFFF;
+  --nb-surface-2: #F0EFE0;
 
-  /* Shadow pair derived from --neu-bg */
-  --neu-dark: #07090f; /* ~55% darker */
-  --neu-light: #152040; /* ~35% lighter */
+  /* Borders */
+  --nb-border: 3px solid #000000;
+  --nb-border-2: 2px solid #000000;
+  --nb-border-4: 4px solid #000000;
 
-  /* Neumorphism shadow tokens */
-  --neu-out: 8px 8px 20px var(--neu-dark), -8px -8px 20px var(--neu-light);
-  --neu-in:
-    inset 5px 5px 14px var(--neu-dark), inset -5px -5px 14px var(--neu-light);
-  --neu-hover:
-    10px 10px 26px var(--neu-dark), -10px -10px 26px var(--neu-light);
-  --neu-press:
-    inset 3px 3px 8px var(--neu-dark), inset -3px -3px 8px var(--neu-light);
+  /* Shadows (flat offset — the neo-brutalism signature) */
+  --nb-shadow:    4px 4px 0 #000000;
+  --nb-shadow-sm: 2px 2px 0 #000000;
+  --nb-shadow-lg: 6px 6px 0 #000000;
+  --nb-shadow-hover: 6px 6px 0 #000000;
 
-  /* Accent — Neon Yellow */
-  --yellow: #f5e642;
-  --yellow-dim: rgba(245, 230, 66, 0.1);
-  --yellow-glow: 0 0 18px rgba(245, 230, 66, 0.45);
-
-  /* Status colours */
-  --green: #22c55e;
-  --green-glow: 0 0 12px rgba(34, 197, 94, 0.5);
-  --orange: #f97316;
-  --orange-glow: 0 0 12px rgba(249, 115, 22, 0.5);
-  --grey: #64748b;
-  --grey-glow: 0 0 8px rgba(100, 116, 139, 0.35);
+  /* Accent colors */
+  --nb-yellow: #FFE500;
+  --nb-yellow-dark: #D4BF00;
+  --nb-red:    #FF3B3B;
+  --nb-blue:   #3B5BFF;
+  --nb-green:  #00C853;
+  --nb-orange: #FF6B00;
+  --nb-purple: #7C3AED;
 
   /* Text */
-  --text-primary: #e8eaf0;
-  --text-secondary: #7a8aaa;
-  --text-muted: #3d4d6a;
+  --nb-text:       #000000;
+  --nb-text-muted: #555555;
+  --nb-text-light: #888888;
+
+  /* Legacy compat for components that still use var() */
+  --yellow: #FFE500;
+  --green:  #00C853;
+  --orange: #FF6B00;
+  --text-primary:   #000000;
+  --text-secondary: #555555;
+  --text-muted:     #888888;
 
   /* Typography */
   --font-main: "Inter", "Segoe UI", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", "Fira Code", monospace;
 
-  /* Border radii */
-  --radius-sm: 10px;
-  --radius-md: 16px;
-  --radius-lg: 22px;
-  --radius-xl: 30px;
+  /* No rounding — hard corners everywhere */
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
 
-  /* Transition */
-  --ease: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --ease: 0.18s ease;
 }
 
-/* ── Reset ────────────────────────────────────────────────── */
-*,
-*::before,
-*::after {
+/* ── Reset ─────────────────────────────────────────────────── */
+*, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
-html {
-  scroll-behavior: smooth;
-}
+
+html { scroll-behavior: smooth; }
 
 body {
   font-family: var(--font-main);
-  background-color: var(--neu-bg);
-  color: var(--text-primary);
+  background-color: var(--nb-bg);
+  color: var(--nb-text);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
@@ -97,23 +95,17 @@ body {
   box-sizing: border-box;
 }
 
-/* ── Scrollbar ────────────────────────────────────────────── */
-::-webkit-scrollbar {
-  width: 5px;
-}
-::-webkit-scrollbar-track {
-  background: var(--neu-bg);
-}
+/* ── Scrollbar ─────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--nb-bg); }
 ::-webkit-scrollbar-thumb {
-  background: var(--neu-light);
-  border-radius: 3px;
+  background: #000;
+  border-radius: 0;
 }
-::-webkit-scrollbar-thumb:hover {
-  background: var(--yellow);
-}
+::-webkit-scrollbar-thumb:hover { background: var(--nb-yellow); }
 
-/* ── Selection ────────────────────────────────────────────── */
+/* ── Selection ─────────────────────────────────────────────── */
 ::selection {
-  background: var(--yellow-dim);
-  color: var(--yellow);
+  background: var(--nb-yellow);
+  color: #000;
 }

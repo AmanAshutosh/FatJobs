@@ -1,16 +1,14 @@
 /* ============================================================
-   DECK PAGE (SDE / DA shared) — Pure Neumorphism
+   DECK PAGE (SDE / DA shared) — Neo-Brutalism
    ============================================================ */
 
 .deck-container {
   min-height: 100vh;
   width: 100%;
-  background: var(--neu-bg);
+  background: var(--nb-bg);
   overflow-x: hidden;
   padding-bottom: 100px;
 }
-
-/* No pseudo-element glow — neumorphism is flat, no radial glows */
 
 .deck-wrapper {
   max-width: 1440px;
@@ -24,151 +22,141 @@
 /* ── Header ────────────────────────────────────────────────── */
 .deck-header {
   text-align: center;
-  margin-bottom: 64px;
+  margin-bottom: 56px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  animation: fadeInUp 0.6s ease-out both;
+  animation: fadeInUp 0.5s ease both;
   width: 100%;
   max-width: 900px;
 }
 
-/* Neu pill badge — extruded */
 .deck-badge {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  background: var(--neu-bg);
-  box-shadow: var(--neu-out);
-  padding: 10px 24px;
-  border-radius: 100px;
-  font-size: 0.7rem;
-  font-weight: 800;
-  color: var(--yellow);
-  letter-spacing: 1.8px;
+  background: #000;
+  border: 3px solid #000;
+  box-shadow: var(--nb-shadow);
+  padding: 8px 20px;
+  font-size: 0.68rem;
+  font-weight: 900;
+  color: var(--nb-yellow);
+  letter-spacing: 2px;
   text-transform: uppercase;
-  text-shadow: var(--yellow-glow);
   margin-bottom: 24px;
 }
 
 .badge-dot {
   width: 9px;
   height: 9px;
-  background: var(--yellow);
+  background: var(--nb-yellow);
   border-radius: 50%;
-  box-shadow: var(--yellow-glow);
   animation: dot-badge-pulse 2s ease-in-out infinite;
+  flex-shrink: 0;
 }
 
 @keyframes dot-badge-pulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(245, 230, 66, 0.6);
-  }
-  70% {
-    box-shadow: 0 0 0 8px rgba(245, 230, 66, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(245, 230, 66, 0);
-  }
+  0%   { box-shadow: 0 0 0 0 rgba(255,229,0,0.6); }
+  70%  { box-shadow: 0 0 0 8px rgba(255,229,0,0); }
+  100% { box-shadow: 0 0 0 0 rgba(255,229,0,0); }
 }
 
 .deck-title {
   font-size: clamp(2.8rem, 7vw, 5rem);
   font-weight: 900;
   letter-spacing: -3px;
-  color: var(--text-primary);
+  color: #000;
   margin-bottom: 14px;
   line-height: 0.95;
+  text-transform: uppercase;
 }
 
 .deck-sub {
-  color: var(--text-secondary);
+  color: var(--nb-text-muted);
   font-size: 1rem;
   max-width: 540px;
   line-height: 1.7;
+  font-weight: 500;
 }
 
-/* ── Filter bar — neu tray ─────────────────────────────────── */
+/* ── Filter bar ────────────────────────────────────────────── */
 .filter-bar {
   display: flex;
   flex-wrap: wrap;
-  gap: 18px;
+  gap: 16px;
   justify-content: center;
   margin-top: 36px;
-  padding: 28px 32px;
-  background: var(--neu-bg);
-  box-shadow: var(--neu-out);
-  border-radius: var(--radius-xl);
+  padding: 24px 28px;
+  background: var(--nb-card);
+  border: 3px solid #000;
+  box-shadow: var(--nb-shadow-lg);
   width: 100%;
-  animation: fadeInUp 0.8s ease-out both;
+  animation: fadeInUp 0.7s ease both;
 }
 
 .filter-group {
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  gap: 6px;
   min-width: 175px;
   flex: 1;
 }
 
 .filter-group label {
-  font-size: 0.63rem;
-  font-weight: 800;
-  color: var(--yellow);
+  font-size: 0.62rem;
+  font-weight: 900;
+  color: #000;
   text-transform: uppercase;
   letter-spacing: 2px;
-  padding-left: 4px;
 }
 
-/* Inputs / selects — inset (recessed into surface) */
 .filter-group input,
 .filter-group select {
   width: 100%;
-  background: var(--neu-bg);
-  box-shadow: var(--neu-in);
-  border: none;
-  color: var(--text-primary);
-  padding: 11px 15px;
-  border-radius: var(--radius-md);
+  background: var(--nb-bg);
+  border: 2px solid #000;
+  color: #000;
+  padding: 10px 14px;
   font-size: 0.87rem;
-  font-weight: 500;
+  font-weight: 600;
   outline: none;
   font-family: var(--font-main);
-  transition: box-shadow var(--ease);
+  transition: box-shadow var(--ease), border-color var(--ease);
   appearance: none;
   -webkit-appearance: none;
+  border-radius: 0;
+  box-shadow: 2px 2px 0 #000;
 }
 
 .filter-group select {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='%237a8aaa'%3E%3Cpath d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='%23000'%3E%3Cpath d='M6 8L0 0h12z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 14px center;
   padding-right: 36px;
   cursor: pointer;
+  background-color: var(--nb-bg);
 }
 
 .filter-group select option {
-  background: var(--neu-bg);
-  color: var(--text-primary);
+  background: #fff;
+  color: #000;
 }
 
 .filter-group input:focus,
 .filter-group select:focus {
-  /* deeper inset on focus */
-  box-shadow:
-    inset 6px 6px 16px var(--neu-dark),
-    inset -6px -6px 16px var(--neu-light);
+  border-color: #000;
+  box-shadow: 4px 4px 0 #000;
+  background: #fff;
 }
 
-.filter-group input::placeholder {
-  color: var(--text-muted);
-}
+.filter-group input::placeholder { color: #999; }
 
 /* ── Job Grid ──────────────────────────────────────────────── */
 .job-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-  gap: 28px;
+  gap: 24px;
   width: 100%;
   justify-items: center;
 }
@@ -181,86 +169,54 @@
   align-items: center;
   gap: 20px;
   padding: 120px 0;
-  color: var(--text-secondary);
+  color: var(--nb-text-muted);
 }
 
 .loading-spinner {
-  width: 46px;
-  height: 46px;
+  width: 48px;
+  height: 48px;
+  border: 4px solid #000;
+  border-top-color: var(--nb-yellow);
   border-radius: 50%;
-  /* Neu ring — shadow creates 3D disc */
-  box-shadow: var(--neu-out);
-  border: 3px solid transparent;
-  border-top-color: var(--yellow);
-  animation: spin 0.9s linear infinite;
+  animation: spin 0.8s linear infinite;
 }
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
+@keyframes spin { to { transform: rotate(360deg); } }
 
 /* ── Empty state ───────────────────────────────────────────── */
 .deck-empty {
   grid-column: 1 / -1;
-  padding: 100px 40px;
+  padding: 80px 40px;
   text-align: center;
-  background: var(--neu-bg);
-  box-shadow: var(--neu-out);
-  border-radius: var(--radius-xl);
+  background: var(--nb-card);
+  border: 3px solid #000;
+  box-shadow: var(--nb-shadow-lg);
+  width: 100%;
 }
 
 .deck-empty h3 {
-  color: var(--yellow);
+  color: #000;
   font-size: 1.6rem;
-  font-weight: 800;
+  font-weight: 900;
   margin-bottom: 10px;
   text-transform: uppercase;
-  text-shadow: var(--yellow-glow);
 }
-
-.deck-empty p {
-  color: var(--text-muted);
-  font-size: 0.95rem;
-}
+.deck-empty p { color: var(--nb-text-muted); font-size: 0.95rem; }
 
 /* ── Animation ─────────────────────────────────────────────── */
 @keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(22px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* ── Responsive ────────────────────────────────────────────── */
 @media (max-width: 1100px) {
-  .job-grid {
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
-  }
+  .job-grid { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px; }
 }
-
 @media (max-width: 768px) {
-  .deck-wrapper {
-    padding: 40px 20px 60px;
-  }
-  .deck-title {
-    font-size: 2.6rem;
-    letter-spacing: -2px;
-  }
-  .filter-bar {
-    flex-direction: column;
-    padding: 20px;
-  }
-  .filter-group {
-    min-width: 100%;
-  }
-  .job-grid {
-    grid-template-columns: 1fr;
-  }
+  .deck-wrapper { padding: 40px 20px 60px; }
+  .deck-title   { font-size: 2.6rem; letter-spacing: -2px; }
+  .filter-bar   { flex-direction: column; padding: 20px; }
+  .filter-group { min-width: 100%; }
+  .job-grid     { grid-template-columns: 1fr; }
 }

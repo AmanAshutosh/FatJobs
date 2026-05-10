@@ -1,5 +1,5 @@
 /* ============================================================
-   NAVBAR — Pure Neumorphism
+   NAVBAR — Neo-Brutalism
    ============================================================ */
 
 .main-nav {
@@ -8,24 +8,17 @@
   left: 0;
   width: 100%;
   height: 64px;
-  background: var(--neu-bg); /* same surface as everything else */
-  box-shadow:
-    0 6px 20px var(--neu-dark),
-    0 -2px 8px var(--neu-light);
-  border-bottom: 1px solid var(--neu-light);
+  background: #000000;
+  border-bottom: 3px solid #000000;
   z-index: 9999;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.3s ease;
 }
 
-.nav-visible {
-  transform: translateY(0);
-}
-.nav-hidden {
-  transform: translateY(-100%);
-}
+.nav-visible  { transform: translateY(0); }
+.nav-hidden   { transform: translateY(-100%); }
 
 .nav-content {
   width: 100%;
@@ -39,14 +32,14 @@
 /* ── Logo ──────────────────────────────────────────────────── */
 .nav-logo {
   font-weight: 900;
-  font-size: 1.35rem;
-  color: var(--text-primary);
+  font-size: 1.4rem;
+  color: #ffffff;
   text-decoration: none;
   letter-spacing: -1px;
+  text-transform: uppercase;
 }
 .nav-logo span {
-  color: var(--yellow);
-  text-shadow: var(--yellow-glow);
+  color: var(--nb-yellow);
 }
 
 /* ── Links ─────────────────────────────────────────────────── */
@@ -58,76 +51,69 @@
 
 .nav-links a {
   text-decoration: none;
-  color: var(--text-secondary);
-  font-weight: 600;
-  font-size: 0.82rem;
-  letter-spacing: 0.5px;
-  padding: 7px 16px;
-  border-radius: var(--radius-sm);
+  color: #aaaaaa;
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.8px;
+  padding: 6px 14px;
+  border: 2px solid transparent;
+  text-transform: uppercase;
   transition: all var(--ease);
-  /* Flat by default — same bg as nav */
-  background: var(--neu-bg);
-  box-shadow: none;
+  background: transparent;
 }
 
 .nav-links a:hover {
-  color: var(--text-primary);
-  box-shadow: var(--neu-out);
+  color: #fff;
+  border: 2px solid #ffffff;
+  background: #222;
 }
 
 .nav-links a.active {
-  color: var(--yellow);
-  box-shadow: var(--neu-in); /* pressed/active = inset */
-  text-shadow: var(--yellow-glow);
+  color: #000;
+  background: var(--nb-yellow);
+  border: 2px solid var(--nb-yellow);
 }
 
 /* ── Profile pill ──────────────────────────────────────────── */
 .profile-icon {
-  background: var(--neu-bg);
-  box-shadow: var(--neu-out);
-  padding: 7px 18px;
-  border-radius: var(--radius-xl);
+  background: transparent;
+  border: 2px solid #555555;
+  color: #aaaaaa;
+  padding: 6px 16px;
   font-size: 0.78rem;
-  color: var(--text-secondary);
-  font-weight: 600;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  letter-spacing: 0.5px;
   transition: all var(--ease);
-  border: none;
 }
-
 .profile-icon:hover {
-  color: var(--yellow);
-  box-shadow: var(--neu-hover);
-  text-shadow: var(--yellow-glow);
+  border-color: var(--nb-yellow);
+  color: var(--nb-yellow);
 }
-
 .profile-icon.active {
-  color: var(--yellow);
-  box-shadow: var(--neu-in);
-  text-shadow: var(--yellow-glow);
+  background: var(--nb-yellow);
+  border-color: var(--nb-yellow);
+  color: #000;
 }
 
-/* ── Resume Analyzer link — highlighted pill ───────────────────────────── */
+/* ── Resume link ───────────────────────────────────────────── */
 .resume-nav-link {
-  background: var(--yellow-dim) !important;
-  color: var(--yellow) !important;
-  border: 1px solid rgba(245, 230, 66, 0.25);
-  box-shadow: none !important;
+  background: var(--nb-yellow) !important;
+  color: #000 !important;
+  border: 2px solid var(--nb-yellow) !important;
 }
 .resume-nav-link:hover {
-  box-shadow: 0 0 14px rgba(245, 230, 66, 0.3) !important;
-  background: rgba(245, 230, 66, 0.15) !important;
+  background: #000 !important;
+  color: var(--nb-yellow) !important;
+  border-color: var(--nb-yellow) !important;
 }
 .resume-nav-link.active {
-  box-shadow: var(--neu-in) !important;
-  text-shadow: var(--yellow-glow);
+  background: var(--nb-yellow) !important;
+  color: #000 !important;
 }
 
 @media (max-width: 540px) {
-  .nav-links a {
-    padding: 6px 10px;
-    font-size: 0.75rem;
-  }
-  .nav-logo {
-    font-size: 1.15rem;
-  }
+  .nav-links a  { padding: 5px 8px; font-size: 0.7rem; }
+  .nav-logo     { font-size: 1.15rem; }
 }
