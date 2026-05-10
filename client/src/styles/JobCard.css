@@ -9,7 +9,7 @@
   background: #fff;
   border: 3px solid #000;
   border-radius: 0;
-  box-shadow: 6px 6px 0 var(--nb-yellow);
+  box-shadow: 6px 6px 0 #888;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -19,12 +19,12 @@
 
 .trump-card:hover {
   transform: translate(-3px, -3px);
-  box-shadow: 9px 9px 0 var(--nb-yellow);
+  box-shadow: 9px 9px 0 #888;
 }
 
 .trump-card:active {
   transform: translate(2px, 2px);
-  box-shadow: 3px 3px 0 var(--nb-yellow);
+  box-shadow: 3px 3px 0 #888;
 }
 
 /* ── Header ─────────────────────────────────────────────────── */
