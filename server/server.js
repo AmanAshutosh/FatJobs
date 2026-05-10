@@ -17,7 +17,30 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // --- 3. MIDDLEWARE ---
-app.use(cors({ origin: "*", methods: ["GET", "POST", "OPTIONS"] }));
+const allowedOrigins = [
+  "https://www.fatjobs.in",
+  "https://fatjobs.in",
+  "http://localhost:5173",
+  "http://localhost:3000",
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // Allow requests with no origin (Postman, curl, health checks)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      callback(new Error(`CORS blocked: ${origin}`));
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  }),
+);
+
+// Ensure preflight OPTIONS is handled for all routes
+app.options("*", cors());
+
 app.use(express.json({ limit: "2mb" }));
 
 // --- 4. HEALTH CHECK ---

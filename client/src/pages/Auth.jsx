@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import API from "../api";
 import "../styles/Auth.css";
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || "https://fatjobs.onrender.com";
 
 const Auth = ({ setUser, onNavigate }) => {
   const [isSignup, setIsSignup] = useState(false);
@@ -46,7 +44,7 @@ const Auth = ({ setUser, onNavigate }) => {
     setLoading(true);
     setError("");
     try {
-      await axios.post(`${API_BASE_URL}/api/auth/request-otp`, {
+      await API.post("/api/auth/request-otp", {
         email: formData.email,
         name: formData.name,
         isSignup,
@@ -70,7 +68,7 @@ const Auth = ({ setUser, onNavigate }) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await axios.post(`${API_BASE_URL}/api/auth/verify-otp`, {
+      const res = await API.post("/api/auth/verify-otp", {
         email: formData.email,
         otp,
       });
@@ -79,7 +77,7 @@ const Auth = ({ setUser, onNavigate }) => {
         setUser(res.data.user);
         onNavigate("/sde");
       }
-    } catch (err) {
+    } catch {
       setError("ACCESS_DENIED: INVALID_KEY");
     } finally {
       setLoading(false);

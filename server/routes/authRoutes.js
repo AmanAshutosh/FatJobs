@@ -3,8 +3,10 @@ const router = express.Router();
 const User = require("../models/User");
 const { Resend } = require("resend");
 
-// Initialize Resend
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Initialize Resend (safe — server won't crash if key is missing)
+const resend = process.env.RESEND_API_KEY
+  ? new Resend(process.env.RESEND_API_KEY)
+  : null;
 const otpStore = new Map();
 
 // 1. REQUEST OTP
@@ -51,6 +53,11 @@ router.post("/request-otp", async (req, res) => {
 
     // OTP remains valid for 5 minutes
     setTimeout(() => otpStore.delete(email), 5 * 60 * 1000);
+
+    if (!resend) {
+      console.error("[RESEND] RESEND_API_KEY is not set — cannot send OTP");
+      return res.status(503).json({ message: "MAIL_SERVER_OFFLINE" });
+    }
 
     // ✅ UPDATED: Now sending from your verified professional domain
     const { data, error } = await resend.emails.send({
