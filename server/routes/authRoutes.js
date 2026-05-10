@@ -78,8 +78,9 @@ router.post("/request-otp", async (req, res) => {
     });
 
     if (error) {
-      console.error("❌ [RESEND_ERROR]:", error);
-      // Log for debugging but return server error to user
+      console.error("❌ [RESEND_ERROR] name:", error.name);
+      console.error("❌ [RESEND_ERROR] message:", error.message);
+      console.error("❌ [RESEND_ERROR] full:", JSON.stringify(error));
       console.log(`🔑 [BACKDOOR] OTP for ${email}: ${otp}`);
       return res.status(500).json({ message: "MAIL_SERVER_OFFLINE" });
     }
